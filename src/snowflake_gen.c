@@ -89,8 +89,9 @@ bsp_t *create_snowflake(int N) {
                     y = M + y / denom;
                 }
             }
-        }
+        } // particle has collided
 
+        // possibly increase the BSP size
         if (x < 0.0 || x >= S || y < 0.0 || y >= S) {
             bsp_t *newB = bsp_increase_size(b);
             bsp_destroy(b);
@@ -103,8 +104,10 @@ bsp_t *create_snowflake(int N) {
             M = S / 2;
         }
 
+        // add the new point
         bsp_add_point(b, x, y);
 
+        // update the creation and destruction boundaries
         double dis = dist_d(x, y, M, M);
         CB = max_d(CB, dis + CB_size);
         DB = max_d(DB, dis + DB_size);
