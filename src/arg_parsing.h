@@ -5,4 +5,6 @@ typedef struct arg_options {
     char *output;
 } arg_options;
 
-arg_options parse_args(int argc, char **argv);
+arg_options *parse_args(int argc, char **argv);
+
+void free_args(arg_options *args);

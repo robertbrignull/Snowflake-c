@@ -18,13 +18,15 @@ int main(int argc, char **argv) {
 
     srand(time(0));
 
-    arg_options args = parse_args(argc, argv);
+    arg_options *args = parse_args(argc, argv);
 
-    bsp_t *b = create_snowflake(args.num_particles);
+    bsp_t *b = create_snowflake(args->num_particles);
 
-    write_image(b, args.output);
+    write_image(b, args->output);
 
     bsp_destroy(b);
+
+    free_args(args);
 
     return 0;
 }
