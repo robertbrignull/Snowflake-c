@@ -6,7 +6,7 @@
 #include "bsp.h"
 #include "algo.h"
 
-bsp_t *create_snowflake(int N) {
+bsp_t *create_snowflake(int N, FILE *log) {
     // S - size
     // M - middle
     double S = 100.0;
@@ -33,7 +33,10 @@ bsp_t *create_snowflake(int N) {
 
         // set c to 1 once this particle collides
         int c = 0;
+        int num_iterations = 0;
         while (c == 0) {
+            ++num_iterations;
+
             // Find the closest particle in the flake
             bsp_result d = bsp_find_nearest(b, x, y);
 
@@ -106,6 +109,11 @@ bsp_t *create_snowflake(int N) {
 
         // add the new point
         bsp_add_point(b, x, y);
+
+        // log the addition of this point
+        if (log != 0) {
+            fprintf(log, "%d %f %f %d\n", n, x, y, num_iterations);
+        }
 
         // update the creation and destruction boundaries
         double dis = dist_d(x, y, M, M);

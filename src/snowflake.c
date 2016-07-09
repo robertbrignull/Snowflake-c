@@ -20,9 +20,14 @@ int main(int argc, char **argv) {
 
     arg_options *args = parse_args(argc, argv);
 
-    bsp_t *b = create_snowflake(args->num_particles);
+    FILE *log = 0;
+    if (args->log_output != 0) {
+        log = fopen(args->log_output, "w");
+    }
 
-    write_image(b, args->output);
+    bsp_t *b = create_snowflake(args->num_particles, log);
+
+    write_image(b, args->image_output);
 
     bsp_destroy(b);
 

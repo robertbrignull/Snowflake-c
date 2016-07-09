@@ -2,4 +2,4 @@
 
 struct bsp_t;
 
-bsp_t *create_snowflake(int N);
+bsp_t *create_snowflake(int N, FILE *log);

@@ -52,10 +52,12 @@ arg_options *parse_args(int argc, char **argv) {
     int num_particles_set = 0;
 
     // optional args
-    char *default_output = "out/output.tga";
-    args->output = (char*) malloc(strlen(default_output) + 1);
-    CHECK_MEM(args->output);
-    strcpy(args->output, default_output);
+    char *default_image_output = "out/output.tga";
+    args->image_output = (char*) malloc(strlen(default_image_output) + 1);
+    CHECK_MEM(args->image_output);
+    strcpy(args->image_output, default_image_output);
+
+    args->log_output = 0;
 
     int argi = 1;
     while (argi < argc) {
@@ -67,10 +69,18 @@ arg_options *parse_args(int argc, char **argv) {
         }
         else if (arg_matches(argv[argi], "--output", "-o")) {
             check_enough_parameters(argv[argi], argc, argi, 1);
-            args->output = (char*) realloc(args->output,
+            args->image_output = (char*) realloc(args->image_output,
                 strlen(argv[argi+1]) + 1);
-            CHECK_MEM(args->output);
-            strcpy(args->output, argv[argi+1]);
+            CHECK_MEM(args->image_output);
+            strcpy(args->image_output, argv[argi+1]);
+            argi += 2;
+        }
+        else if (arg_matches(argv[argi], "--log", "-l")) {
+            check_enough_parameters(argv[argi], argc, argi, 1);
+            args->log_output = (char*) realloc(args->log_output,
+                strlen(argv[argi+1]) + 1);
+            CHECK_MEM(args->log_output);
+            strcpy(args->log_output, argv[argi+1]);
             argi += 2;
         }
         else {
@@ -86,6 +96,9 @@ arg_options *parse_args(int argc, char **argv) {
 }
 
 void free_args(arg_options *args) {
-    free(args->output);
+    free(args->image_output);
+    if (args->log_output != 0) {
+        free(args->log_output);
+    }
     free(args);
 }
