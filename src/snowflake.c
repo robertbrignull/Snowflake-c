@@ -22,7 +22,7 @@ int main(int argc, char **argv) {
 
     bsp_t *b = create_snowflake(args.num_particles);
 
-    write_image(b, "out/output.tga");
+    write_image(b, args.output);
 
     bsp_destroy(b);
 
