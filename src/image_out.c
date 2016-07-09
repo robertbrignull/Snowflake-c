@@ -6,16 +6,16 @@
 #include "bsp.h"
 #include "algo.h"
 
-char *generateImage(BSP_t *b, int S) {
+char *generate_image(bsp_t *b, int S) {
     char *P = (char*) malloc(S*S);
     CHECK_MEM(P);
 
     memset(P, 0, S*S);
 
-    BSP_iterator it = BSP_iterator_new(b);
+    bsp_iterator it = bsp_iterator_new(b);
 
-    while (BSP_iterator_hasNext(it)) {
-        BSP_result r = BSP_iterator_next(&it);
+    while (bsp_iterator_has_next(it)) {
+        bsp_result r = bsp_iterator_next(&it);
 
         int x = (int) floor(r.x);
         int y = (int) floor(r.y);
@@ -26,7 +26,7 @@ char *generateImage(BSP_t *b, int S) {
     return P;
 }
 
-void writeRun(FILE *out, int v, int l) {
+void write_run(FILE *out, int v, int l) {
     unsigned char header = 127 + l;
     unsigned char data = v;
 
@@ -34,11 +34,11 @@ void writeRun(FILE *out, int v, int l) {
     fwrite(&data, 1, 1, out);
 }
 
-void writeImage(BSP_t *b, char *filename) {
+void write_image(bsp_t *b, char *filename) {
     int S = (int) ceil(b->S);
 
     // Write the flake to a 2D array of pixels
-    char *P = generateImage(b, S);
+    char *P = generate_image(b, S);
 
     // Find the bounds of the image
     int BN, BS, BW, BE;
@@ -93,16 +93,16 @@ void writeImage(BSP_t *b, char *filename) {
 
     FILE *out = fopen(filename, "w");
 
-    unsigned char IDLength = 0;
-    unsigned char cMapType = 0;
-    unsigned char imageType = 11;
+    unsigned char id_length = 0;
+    unsigned char color_map_type = 0;
+    unsigned char image_type = 11;
 
-    unsigned short cMapIndex = 0;
-    unsigned short cMapLength = 0;
-    unsigned char cMapS = 0;
+    unsigned short color_map_index = 0;
+    unsigned short color_map_length = 0;
+    unsigned char color_map_entry_size = 0;
 
-    unsigned short xOrigin = 0;
-    unsigned short yOrigin = 0;
+    unsigned short x_origin = 0;
+    unsigned short y_origin = 0;
     unsigned short width = BE - BW + 1;
     unsigned short height = BS - BN + 1;
     unsigned char depth = 8;
@@ -110,16 +110,16 @@ void writeImage(BSP_t *b, char *filename) {
 
 
 
-    fwrite(&IDLength, 1, 1, out);
-    fwrite(&cMapType, 1, 1, out);
-    fwrite(&imageType, 1, 1, out);
+    fwrite(&id_length, 1, 1, out);
+    fwrite(&color_map_type, 1, 1, out);
+    fwrite(&image_type, 1, 1, out);
 
-    fwrite(&cMapIndex, 2, 1, out);
-    fwrite(&cMapLength, 2, 1, out);
-    fwrite(&cMapS, 1, 1, out);
+    fwrite(&color_map_index, 2, 1, out);
+    fwrite(&color_map_length, 2, 1, out);
+    fwrite(&color_map_entry_size, 1, 1, out);
 
-    fwrite(&xOrigin, 2, 1, out);
-    fwrite(&yOrigin, 2, 1, out);
+    fwrite(&x_origin, 2, 1, out);
+    fwrite(&y_origin, 2, 1, out);
     fwrite(&width, 2, 1, out);
     fwrite(&height, 2, 1, out);
     fwrite(&depth, 1, 1, out);
@@ -139,7 +139,7 @@ void writeImage(BSP_t *b, char *filename) {
         int i = y*S + x;
 
         if (P[i] != v || l == 127) {
-            writeRun(out, v, l);
+            write_run(out, v, l);
             
             l = 1;
             v = P[i];
@@ -153,7 +153,7 @@ void writeImage(BSP_t *b, char *filename) {
             y++;
         }
     }
-    writeRun(out, v, l);
+    write_run(out, v, l);
 
     fclose(out);
 

@@ -1,10 +1,10 @@
 #pragma once
 
-typedef enum BSP_type_e {BSP_HLINE, BSP_VLINE, BSP_POINT, BSP_EMPTY} BSP_type_e;
+typedef enum bsp_type_e {BSP_HLINE, BSP_VLINE, BSP_POINT, BSP_EMPTY} bsp_type_e;
 
-typedef struct BSP_node {
+typedef struct bsp_node {
     // The type of this node, determines how to use the union below
-    BSP_type_e type;
+    bsp_type_e type;
 
     // The parent of this node
     int parent;
@@ -22,59 +22,59 @@ typedef struct BSP_node {
             int left, right;
         };
     };
-} BSP_node;
+} bsp_node;
 
-typedef struct BSP_t {
-    // The size of this BSP tree
+typedef struct bsp_t {
+    // The size of this bsp tree
     double S;
 
     // A dynamically allocated array of nodes, with the root at index 1
-    BSP_node *nodes;
+    bsp_node *nodes;
 
     // The size of the nodes array
     int size;
 
     // The number of nodes in the array
     int numNodes;
-} BSP_t;
+} bsp_t;
 
-typedef struct BSP_result {
+typedef struct bsp_result {
     // How far to the node
     double d;
 
     // Where actually was the node
     double x, y;
-} BSP_result;
+} bsp_result;
 
-typedef struct BSP_iterator {
-    // The BSP tree we're operating on
-    BSP_t *b;
+typedef struct bsp_iterator {
+    // The bsp tree we're operating on
+    bsp_t *b;
 
     // Which node are we on currently
     int current;
-} BSP_iterator;
+} bsp_iterator;
 
 
 
-// Creates an empty BSP tree with the given size
-BSP_t *BSP_new(double S);
+// Creates an empty bsp tree with the given size
+bsp_t *bsp_new(double S);
 
 // Destroys the tree, freeing memory
-void BSP_destroy(BSP_t *b);
+void bsp_destroy(bsp_t *b);
 
-// Increases the size of the BSP, returning a new one
-BSP_t *BSP_increaseSize(BSP_t *b);
+// Increases the size of the bsp, returning a new one
+bsp_t *bsp_increase_size(bsp_t *b);
 
 // Adds a point to the tree
-void BSP_addPoint(BSP_t *b, double x, double y);
+void bsp_add_point(bsp_t *b, double x, double y);
 
 // Returns the distance to the nearest point in the tree
-BSP_result BSP_findNearest(BSP_t *b, double x, double y);
+bsp_result bsp_find_nearest(bsp_t *b, double x, double y);
 
-// For testing, prints a BSP tree
-void BSP_print(BSP_t *b);
+// For testing, prints a bsp tree
+void bsp_print(bsp_t *b);
 
-// Allows you to iterate through a BSP tree
-BSP_iterator BSP_iterator_new(BSP_t *b);
-int BSP_iterator_hasNext(BSP_iterator i);
-BSP_result BSP_iterator_next(BSP_iterator *i);
+// Allows you to iterate through a bsp tree
+bsp_iterator bsp_iterator_new(bsp_t *b);
+int bsp_iterator_has_next(bsp_iterator i);
+bsp_result bsp_iterator_next(bsp_iterator *i);

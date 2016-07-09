@@ -6,18 +6,22 @@
 #include "bsp.h"
 #include "algo.h"
 
-BSP_t *createSnowflake(int N) {
+bsp_t *create_snowflake(int N) {
+    // S - size
+    // M - middle
     double S = 100.0;
     double M = S / 2;
 
-    BSP_t *b = BSP_new(S);
+    bsp_t *b = bsp_new(S);
 
-    BSP_addPoint(b, M, M);
+    bsp_add_point(b, M, M);
 
-    double CBSize = 10.0;
-    double DBSize = 50.0;
-    double CB = CBSize;
-    double DB = DBSize;
+    // CB - shorthand for Creation Boundary
+    // DB - shorthand for Destruction Boundary
+    double CB_size = 10.0;
+    double DB_size = 50.0;
+    double CB = CB_size;
+    double DB = DB_size;
 
     for (int n = 0; n < N; n++) {
         if (n % 10000 == 0) printf("%d\n", n);
@@ -31,7 +35,7 @@ BSP_t *createSnowflake(int N) {
         int c = 0;
         while (c == 0) {
             // Find the closest particle in the flake
-            BSP_result d = BSP_findNearest(b, x, y);
+            bsp_result d = bsp_find_nearest(b, x, y);
 
             // Check if we've collided
             if (d.d <= 2.0) {
@@ -88,8 +92,8 @@ BSP_t *createSnowflake(int N) {
         }
 
         if (x < 0.0 || x >= S || y < 0.0 || y >= S) {
-            BSP_t *newB = BSP_increaseSize(b);
-            BSP_destroy(b);
+            bsp_t *newB = bsp_increase_size(b);
+            bsp_destroy(b);
 
             x += M;
             y += M;
@@ -99,11 +103,11 @@ BSP_t *createSnowflake(int N) {
             M = S / 2;
         }
 
-        BSP_addPoint(b, x, y);
+        bsp_add_point(b, x, y);
 
         double dis = dist_d(x, y, M, M);
-        CB = max_d(CB, dis + CBSize);
-        DB = max_d(DB, dis + DBSize);
+        CB = max_d(CB, dis + CB_size);
+        DB = max_d(DB, dis + DB_size);
     }
 
     return b;

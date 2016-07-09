@@ -5,6 +5,6 @@ This idea was first catalysed by a friend doing the same thing for a university 
 
 To walk a particle, we don't simulate every step but make large jumps. We also work entirely with floating point numbers rather than integers to stop the square grid influencing the snowflake shape. The algorithm is to find the closest element of the current flake to our particle, if we have not collided then use the distance to the flake and move the particle that far in some random direction and repeat. This is correct as a random walk has a uniform chance of hitting any point on a surrounding circle.
 
-We use a BSP to store the snowflake as that was deemed to be the fastest datastructure for querying the nearest element to a point.
+We use a bsp to store the snowflake as that was deemed to be the fastest datastructure for querying the nearest element to a point.
 
 The output format is TGA because that was the easiest to manually write.

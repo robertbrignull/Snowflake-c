@@ -6,8 +6,8 @@
 #include <math.h>
 
 #include "bsp.h"
-#include "imageOut.h"
-#include "snowflakeGen.h"
+#include "image_out.h"
+#include "snowflake_gen.h"
 
 int main(int argc, char **argv) {
     if (argc < 2) {
@@ -25,11 +25,11 @@ int main(int argc, char **argv) {
     int N;  // N is the max number of particles
     sscanf(argv[1], "%d", &N);
 
-    BSP_t *b = createSnowflake(N);
+    bsp_t *b = create_snowflake(N);
 
-    writeImage(b, "out/output.tga");
+    write_image(b, "out/output.tga");
 
-    BSP_destroy(b);
+    bsp_destroy(b);
 
     return 0;
 }
