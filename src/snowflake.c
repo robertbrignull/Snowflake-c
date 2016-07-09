@@ -124,7 +124,7 @@ int main(int argc, char **argv) {
         DB = max_d(DB, dis + DBSize);
     }
 
-    writeImage(b, "output.tga");
+    writeImage(b, "out/output.tga");
 
     BSP_destroy(b);
 
