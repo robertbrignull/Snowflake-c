@@ -5,16 +5,12 @@
 #include <sys/resource.h>
 #include <math.h>
 
+#include "arg_parsing.h"
 #include "bsp.h"
 #include "image_out.h"
 #include "snowflake_gen.h"
 
 int main(int argc, char **argv) {
-    if (argc < 2) {
-        printf("Usage: snowflake numParticles\n");
-        exit(0);
-    }
-
     // Limit memory usage to around 6GB
     struct rlimit lim;
     lim.rlim_cur = lim.rlim_max = 6000000000L;
@@ -22,10 +18,9 @@ int main(int argc, char **argv) {
 
     srand(time(0));
 
-    int N;  // N is the max number of particles
-    sscanf(argv[1], "%d", &N);
+    arg_options args = parse_args(argc, argv);
 
-    bsp_t *b = create_snowflake(N);
+    bsp_t *b = create_snowflake(args.num_particles);
 
     write_image(b, "out/output.tga");
 
