@@ -28,6 +28,12 @@ void print_unrecognised_argument(char *arg) {
 }
 
 arg_options parse_args(int argc, char **argv) {
+    if (argc == 1 ||
+        strcmp("--help", argv[1]) == 0 || strcmp("-h", argv[1]) == 0)
+    {
+        print_usage();
+    }
+
     if (argc < 2) {
         print_missing_argument("num_particles");
     }
