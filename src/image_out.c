@@ -3,8 +3,10 @@
 #include <string.h>
 #include <math.h>
 
-#include "bsp.h"
 #include "algo.h"
+#include "bsp.h"
+
+#include "image_out.h"
 
 char *generate_image(bsp_t *b, int S) {
     char *P = (char*) malloc(S*S);

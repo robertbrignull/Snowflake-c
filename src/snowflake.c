@@ -1,9 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <time.h>
 #include <sys/resource.h>
-#include <math.h>
 
 #include "arg_parsing.h"
 #include "bsp.h"

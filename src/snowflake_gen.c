@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <math.h>
 
-#include "bsp.h"
 #include "algo.h"
+#include "bsp.h"
+
+#include "snowflake_gen.h"
 
 bsp_t *create_snowflake(int N, FILE *log) {
     // S - size
