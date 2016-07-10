@@ -1,4 +1,4 @@
-CFLAGS = -std=c99 -Wall
+CFLAGS = -std=c99 -Wall -O3
 LIBS = -lm
 
 OBJS = src/algo.o src/arg_parsing.o src/bsp.o src/bsp_test.o src/image_out.o src/snowflake.o src/snowflake_gen.o
