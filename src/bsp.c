@@ -45,11 +45,9 @@ bsp_t *bsp_increase_size(bsp_t *b) {
     bsp_t *new_b = bsp_new(b->S * 2.0);
 
     bsp_iterator it = bsp_iterator_new(b);
-
-    double S2 = b->S / 2.0;
     while (bsp_iterator_has_next(it)) {
         bsp_result r = bsp_iterator_next(&it);
-        bsp_add_point(new_b, r.x + S2, r.y + S2);
+        bsp_add_point(new_b, r.x, r.y);
     }
 
     return new_b;
@@ -57,17 +55,17 @@ bsp_t *bsp_increase_size(bsp_t *b) {
 
 // Adds a point to the tree
 void bsp_add_point(bsp_t *b, double x, double y) {
-    if (x < 0.0 || x >= b->S || y < 0.0 || y >= b->S) {
+    if (x <= -b->S || x >= b->S || y <= -b->S || y >= b->S) {
         printf("Cannot add (%f, %f), outside of bsp region.\n", x, y);
         return;
     }
 
     px = x;
     py = y;
-    ox = 0.0;
-    oy = 0.0;
-    w = b->S;
-    h = b->S;
+    ox = -b->S;
+    oy = -b->S;
+    w = b->S * 2;
+    h = b->S * 2;
     last_type = BSP_HLINE;
 
     bsp_add_point_impl(b, 0);
@@ -77,20 +75,20 @@ void bsp_add_point(bsp_t *b, double x, double y) {
 bsp_result bsp_find_nearest(bsp_t *b, double x, double y) {
     px = x;
     py = y;
-    ox = 0.0;
-    oy = 0.0;
-    w = b->S;
-    h = b->S;
+    ox = -b->S;
+    oy = -b->S;
+    w = b->S * 2;
+    h = b->S * 2;
 
     return bsp_find_nearest_impl(b, 0);
 }
 
 // For testing, prints a tree
 void bsp_print(bsp_t *b) {
-    ox = 0.0;
-    oy = 0.0;
-    w = b->S;
-    h = b->S;
+    ox = -b->S;
+    oy = -b->S;
+    w = b->S * 2;
+    h = b->S * 2;
 
     bsp_print_impl(b, 0);
 }

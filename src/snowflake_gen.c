@@ -9,13 +9,15 @@
 
 bsp_t *create_snowflake(int N, FILE *log) {
     // S - size
-    // M - middle
-    double S = 100.0;
-    double M = S / 2;
+    double S = 50.0;
 
     bsp_t *b = bsp_new(S);
 
-    bsp_add_point(b, M, M);
+    bsp_add_point(b, 0.0, 0.0);
+
+    if (log != 0) {
+        fprintf(log, "%d %f %f %d\n", 0, 0.0, 0.0, 0);
+    }
 
     // CB - shorthand for Creation Boundary
     // DB - shorthand for Destruction Boundary
@@ -29,8 +31,8 @@ bsp_t *create_snowflake(int N, FILE *log) {
 
         // spawn somewhere on the bounding circle
         double r = (double) rand();
-        double x = M + CB * cos(r);
-        double y = M + CB * sin(r);
+        double x = CB * cos(r);
+        double y = CB * sin(r);
 
         // set c to 1 once this particle collides
         int c = 0;
@@ -54,7 +56,7 @@ bsp_t *create_snowflake(int N, FILE *log) {
                 y += d.d * sin(r);
 
                 // Check if we've left the area
-                if (dist_d(x, y, M, M) > DB) {
+                if (dist_d(x, y, 0.0, 0.0) > DB) {
                     // Use conformals maps to map (x, y) back onto the CB
                     r = (double) rand();
                     double x1 = cos(r);
@@ -63,8 +65,8 @@ bsp_t *create_snowflake(int N, FILE *log) {
                     // Use g(z) = r * (p + r * z) / (r + p * z)
 
                     // Translate (x, y) to around the origin
-                    double px = x - M;
-                    double py = y - M;
+                    double px = x;
+                    double py = y;
 
                     // Precalculate some things
                     double CB2 = CB*CB;
@@ -87,25 +89,21 @@ bsp_t *create_snowflake(int N, FILE *log) {
                     double denom = CB2 + CBpx_2*x1 - CBpy_2*y1 - 4.0*pxy*xy - px2*(x2+y2) - py2*x2_y2;
 
                     x = CB2*(px+x1) + CBx*px2_py2 - 2.0*CBy*pxy + CBpx*x2_y2 - CBpy_2*xy;
-                    x = M + x / denom;
+                    x = x / denom;
 
                     y = CB2*(py+y1) + CBy*px2_py2 + 2.0*CBx*pxy + CBpy*x2_y2 + CBpx_2*xy;
-                    y = M + y / denom;
+                    y = y / denom;
                 }
             }
         } // particle has collided
 
         // possibly increase the BSP size
-        if (x < 0.0 || x >= S || y < 0.0 || y >= S) {
+        if (x <= -S || x >= S || y <= -S || y >= S) {
             bsp_t *newB = bsp_increase_size(b);
             bsp_destroy(b);
-
-            x += M;
-            y += M;
             
             b = newB;
             S = b->S;
-            M = S / 2;
         }
 
         // add the new point
@@ -117,7 +115,7 @@ bsp_t *create_snowflake(int N, FILE *log) {
         }
 
         // update the creation and destruction boundaries
-        double dis = dist_d(x, y, M, M);
+        double dis = dist_d(x, y, 0.0, 0.0);
         CB = max_d(CB, dis + CB_size);
         DB = max_d(DB, dis + DB_size);
     }

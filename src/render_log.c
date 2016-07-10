@@ -9,29 +9,22 @@
 #include "render_log.h"
 
 void find_bounds_log(FILE *log, int *BN, int *BS, int *BW, int *BE) {
-    int bn, bs, bw, be;
+    int bn = 0;
+    int bs = 0;
+    int bw = 0;
+    int be = 0;
 
     fseek(log, 0, SEEK_SET);
 
-    int first_line = 1;
     double d_x, d_y;
     while (fscanf(log, "%*d %lf %lf %*d", &d_x, &d_y) == 2) {
         int x = (int) floor(d_x);
         int y = (int) floor(d_y);
 
-        if (first_line) {
-            bn = y;
-            bs = y;
-            bw = x;
-            be = x;
-            first_line = 0;
-        }
-        else {
-            bn = min_i(bn, y);
-            bs = max_i(bs, y);
-            bw = min_i(bw, x);
-            be = max_i(be, x);
-        }
+        bn = min_i(bn, y);
+        bs = max_i(bs, y);
+        bw = min_i(bw, x);
+        be = max_i(be, x);
     }
 
     *BN = bn;

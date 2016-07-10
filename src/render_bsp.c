@@ -10,11 +10,10 @@
 #include "render_bsp.h"
 
 void find_bounds_bsp(bsp_t *b, int *BN, int *BS, int *BW, int *BE) {
-    int M = ((int) ceil(b->S)) / 2;
-    int bn = M;
-    int bs = M;
-    int bw = M;
-    int be = M;
+    int bn = 0;
+    int bs = 0;
+    int bw = 0;
+    int be = 0;
 
     bsp_iterator it = bsp_iterator_new(b);
 
