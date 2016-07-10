@@ -65,39 +65,39 @@ arg_options *parse_args(int argc, char **argv) {
         args->mode = SNOWFLAKE_GEN;
 
         // required args
-        args->num_particles = 0;
+        args->gen.num_particles = 0;
         int num_particles_set = 0;
 
         // optional args
         char *default_image_output = "out/output.tga";
-        args->image_output = (char*) malloc(strlen(default_image_output) + 1);
-        CHECK_MEM(args->image_output);
-        strcpy(args->image_output, default_image_output);
+        args->gen.image_output = (char*) malloc(strlen(default_image_output) + 1);
+        CHECK_MEM(args->gen.image_output);
+        strcpy(args->gen.image_output, default_image_output);
 
-        args->log_output = 0;
+        args->gen.log_output = 0;
 
         int argi = 2;
         while (argi < argc) {
             if (arg_matches(argv[argi], "--num-particles", "-n")) {
                 check_enough_parameters(argv[argi], argc, argi, 1);
-                args->num_particles = atoi(argv[argi+1]);
+                args->gen.num_particles = atoi(argv[argi+1]);
                 num_particles_set = 1;
                 argi += 2;
             }
             else if (arg_matches(argv[argi], "--output", "-o")) {
                 check_enough_parameters(argv[argi], argc, argi, 1);
-                args->image_output = (char*) realloc(args->image_output,
+                args->gen.image_output = (char*) realloc(args->gen.image_output,
                     strlen(argv[argi+1]) + 1);
-                CHECK_MEM(args->image_output);
-                strcpy(args->image_output, argv[argi+1]);
+                CHECK_MEM(args->gen.image_output);
+                strcpy(args->gen.image_output, argv[argi+1]);
                 argi += 2;
             }
             else if (arg_matches(argv[argi], "--log", "-l")) {
                 check_enough_parameters(argv[argi], argc, argi, 1);
-                args->log_output = (char*) realloc(args->log_output,
+                args->gen.log_output = (char*) realloc(args->gen.log_output,
                     strlen(argv[argi+1]) + 1);
-                CHECK_MEM(args->log_output);
-                strcpy(args->log_output, argv[argi+1]);
+                CHECK_MEM(args->gen.log_output);
+                strcpy(args->gen.log_output, argv[argi+1]);
                 argi += 2;
             }
             else {
@@ -107,6 +107,47 @@ arg_options *parse_args(int argc, char **argv) {
 
         if (!num_particles_set) {
             print_missing_argument("--num-particles");
+        }
+    }
+    else if (arg_matches(argv[1], "render", 0)) { // RENDER
+        args->mode = RENDER;
+
+        // required args
+        args->render.log_input = 0;
+        int log_input_set = 0;
+
+        // optional args
+        char *default_image_output = "out/output.tga";
+        args->render.image_output = (char*) malloc(strlen(default_image_output) + 1);
+        CHECK_MEM(args->render.image_output);
+        strcpy(args->render.image_output, default_image_output);
+
+        int argi = 2;
+        while (argi < argc) {
+            if (arg_matches(argv[argi], "--output", "-o")) {
+                check_enough_parameters(argv[argi], argc, argi, 1);
+                args->render.image_output = (char*) realloc(args->render.image_output,
+                    strlen(argv[argi+1]) + 1);
+                CHECK_MEM(args->render.image_output);
+                strcpy(args->render.image_output, argv[argi+1]);
+                argi += 2;
+            }
+            else if (arg_matches(argv[argi], "--log", "-l")) {
+                check_enough_parameters(argv[argi], argc, argi, 1);
+                args->render.log_input = (char*) realloc(args->render.log_input,
+                    strlen(argv[argi+1]) + 1);
+                CHECK_MEM(args->render.log_input);
+                strcpy(args->render.log_input, argv[argi+1]);
+                log_input_set = 1;
+                argi += 2;
+            }
+            else {
+                print_unrecognised_argument(argv[argi]);
+            }
+        }
+
+        if (!log_input_set) {
+            print_missing_argument("--log");
         }
     }
     else if (arg_matches(argv[1], "bsp_test", 0)) { // BSP_TEST
@@ -120,10 +161,20 @@ arg_options *parse_args(int argc, char **argv) {
 }
 
 void free_args(arg_options *args) {
-    free(args->image_output);
     if (args->mode == SNOWFLAKE_GEN) {
-        if (args->log_output != 0) {
-            free(args->log_output);
+        if (args->gen.image_output != 0) {
+            free(args->gen.image_output);
+        }
+        if (args->gen.log_output != 0) {
+            free(args->gen.log_output);
+        }
+    }
+    else if (args->mode == RENDER) {
+        if (args->render.image_output != 0) {
+            free(args->render.image_output);
+        }
+        if (args->render.log_input != 0) {
+            free(args->render.log_input);
         }
     }
     free(args);

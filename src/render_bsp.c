@@ -9,7 +9,7 @@
 
 #include "render_bsp.h"
 
-void find_bounds(bsp_t *b, int *BN, int *BS, int *BW, int *BE) {
+void find_bounds_bsp(bsp_t *b, int *BN, int *BS, int *BW, int *BE) {
     int M = ((int) ceil(b->S)) / 2;
     int bn = M;
     int bs = M;
@@ -36,9 +36,9 @@ void find_bounds(bsp_t *b, int *BN, int *BS, int *BW, int *BE) {
     *BE = be;
 }
 
-char *generate_image(bsp_t *b, int *w, int *h) {
+char *generate_image_bsp(bsp_t *b, int *w, int *h) {
     int BN, BS, BW, BE;
-    find_bounds(b, &BN, &BS, &BW, &BE);
+    find_bounds_bsp(b, &BN, &BS, &BW, &BE);
 
     int width = BE - BW + 1;
     int height = BS - BN + 1;
@@ -72,7 +72,7 @@ char *generate_image(bsp_t *b, int *w, int *h) {
 void render_bsp(bsp_t *b, char *filename) {
     // Write the flake to a 2D array of pixels
     int width, height;
-    char *P = generate_image(b, &width, &height);
+    char *P = generate_image_bsp(b, &width, &height);
 
     write_tga(filename, P, width, height);
 
