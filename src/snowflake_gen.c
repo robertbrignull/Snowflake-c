@@ -56,7 +56,7 @@ bsp_t *create_snowflake(int N, FILE *log) {
                 y += d.d * sin(r);
 
                 // Check if we've left the area
-                if (dist_d(x, y, 0.0, 0.0) > DB) {
+                if (dist_origin_d(x, y) > DB) {
                     // Use conformals maps to map (x, y) back onto the CB
                     r = (double) rand();
                     double x1 = cos(r);
@@ -115,7 +115,7 @@ bsp_t *create_snowflake(int N, FILE *log) {
         }
 
         // update the creation and destruction boundaries
-        double dis = dist_d(x, y, 0.0, 0.0);
+        double dis = dist_origin_d(x, y);
         CB = max_d(CB, dis + CB_size);
         DB = max_d(DB, dis + DB_size);
     }
