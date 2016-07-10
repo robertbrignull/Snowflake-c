@@ -6,7 +6,7 @@
 #include "arg_parsing.h"
 #include "bsp.h"
 #include "bsp_test.h"
-#include "image_out.h"
+#include "render_bsp.h"
 #include "snowflake_gen.h"
 
 int main(int argc, char **argv) {
@@ -27,7 +27,7 @@ int main(int argc, char **argv) {
 
         bsp_t *b = create_snowflake(args->num_particles, log);
 
-        write_image(b, args->image_output);
+        render_bsp(b, args->image_output);
 
         bsp_destroy(b);
     }
