@@ -5,6 +5,7 @@
 
 #include "algo.h"
 #include "bsp.h"
+#include "tga.h"
 
 #include "image_out.h"
 
@@ -22,33 +23,19 @@ char *generate_image(bsp_t *b, int S) {
         int x = (int) floor(r.x);
         int y = (int) floor(r.y);
 
-        P[y*S + x] = 255;
+        if (x >= 0 && x < S && y >= 0 && y < S) {
+            P[pix(x, y, S, S)] = 255;
+        }
     }
 
     return P;
 }
 
-void write_run(FILE *out, int v, int l) {
-    unsigned char header = 127 + l;
-    unsigned char data = v;
-
-    fwrite(&header, 1, 1, out);
-    fwrite(&data, 1, 1, out);
-}
-
-void write_image(bsp_t *b, char *filename) {
-    int S = (int) ceil(b->S);
-
-    // Write the flake to a 2D array of pixels
-    char *P = generate_image(b, S);
-
-    // Find the bounds of the image
-    int BN, BS, BW, BE;
-
+void find_bounds(char *P, int S, int *BN, int *BS, int *BW, int *BE) {
     for (int y = 0; y < S; y++) {
         for (int x = 0; x < S; x++) {
-            if (P[y*S+x]) {
-                BN = y; 
+            if (P[pix(x, y, S, S)]) {
+                *BN = y; 
                 goto DoneBN;
             }
         }
@@ -57,8 +44,8 @@ void write_image(bsp_t *b, char *filename) {
 
     for (int y = S-1; y >= 0; y--) {
         for (int x = 0; x < S; x++) {
-            if (P[y*S+x]) {
-                BS = y; 
+            if (P[pix(x, y, S, S)]) {
+                *BS = y; 
                 goto DoneBS;
             }
         }
@@ -67,8 +54,8 @@ void write_image(bsp_t *b, char *filename) {
 
     for (int x = S-1; x >= 0; x--) {
         for (int y = 0; y < S; y++) {
-            if (P[y*S+x]) {
-                BE = x; 
+            if (P[pix(x, y, S, S)]) {
+                *BE = x; 
                 goto DoneBE;
             }
         }
@@ -77,8 +64,8 @@ void write_image(bsp_t *b, char *filename) {
 
     for (int x = 0; x < S; x++) {
         for (int y = 0; y < S; y++) {
-            if (P[y*S+x]) {
-                BW = x;
+            if (P[pix(x, y, S, S)]) {
+                *BW = x;
                 goto DoneBW;
             }
         }
@@ -86,78 +73,62 @@ void write_image(bsp_t *b, char *filename) {
     DoneBW:;
 
     // for prettyness
-    BN -= 10;
-    BS += 10;
-    BW -= 10;
-    BE += 10;
+    *BN -= 10;
+    *BS += 10;
+    *BW -= 10;
+    *BE += 10;
+}
 
+char *shrink_image(char *P1, int size1, int width, int height, int left, int top) {
+    char *P2 = (char*) malloc(width * height);
+    CHECK_MEM(P2);
 
+    memset(P2, 0, width * height);
 
-    FILE *out = fopen(filename, "w");
+    for (int x2 = 0; x2 < width; x2++) {
+        for (int y2 = 0; y2 < height; y2++) {
+            int x1 = x2 + left;
+            int y1 = y2 + top;
 
-    unsigned char id_length = 0;
-    unsigned char color_map_type = 0;
-    unsigned char image_type = 11;
+            int z1 = pix(x1, y1, size1, size1);
+            int z2 = pix(x2, y2, width, height);
 
-    unsigned short color_map_index = 0;
-    unsigned short color_map_length = 0;
-    unsigned char color_map_entry_size = 0;
-
-    unsigned short x_origin = 0;
-    unsigned short y_origin = 0;
-    unsigned short width = BE - BW + 1;
-    unsigned short height = BS - BN + 1;
-    unsigned char depth = 8;
-    unsigned char descriptor = 0;
-
-
-
-    fwrite(&id_length, 1, 1, out);
-    fwrite(&color_map_type, 1, 1, out);
-    fwrite(&image_type, 1, 1, out);
-
-    fwrite(&color_map_index, 2, 1, out);
-    fwrite(&color_map_length, 2, 1, out);
-    fwrite(&color_map_entry_size, 1, 1, out);
-
-    fwrite(&x_origin, 2, 1, out);
-    fwrite(&y_origin, 2, 1, out);
-    fwrite(&width, 2, 1, out);
-    fwrite(&height, 2, 1, out);
-    fwrite(&depth, 1, 1, out);
-    fwrite(&descriptor, 1, 1, out);
-
-
-
-    // Store the image run-length encoded
-
-    int y = BN;         // our current position
-    int x = BW + 1;
-
-    int l = 1;          // the length of the current run
-    int v = P[y*S + 1]; // the value of the current run
-
-    while (y <= BS && x <= BE) {
-        int i = y*S + x;
-
-        if (P[i] != v || l == 127) {
-            write_run(out, v, l);
-            
-            l = 1;
-            v = P[i];
-        }
-        else {
-            l++;
-        }
-
-        if (++x > BE) {
-            x = BW;
-            y++;
+            // do this check to handle our viewport extending
+            // beyond the original image's bounds
+            if (x1 >= 0 && x1 < size1 &&
+                y1 >= 0 && y1 < size1 &&
+                z1 >= 0 && z1 < size1*size1)
+            {
+                P2[z2] = P1[z1];
+            }
         }
     }
-    write_run(out, v, l);
 
-    fclose(out);
+    return P2;
+}
 
-    free(P);
+void write_image(bsp_t *b, char *filename) {
+    int unshrunk_size = (int) ceil(b->S);
+
+    // Write the flake to a 2D array of pixels
+    char *unshrunk_pixels = generate_image(b, unshrunk_size);
+
+    // find the bound of the image
+    int BN, BS, BW, BE;
+    find_bounds(unshrunk_pixels, unshrunk_size, &BN, &BS, &BW, &BE);
+
+    int width = BE - BW + 1;
+    int height = BS - BN + 1;
+    int left = BW;
+    int top = BN;
+
+    // // shrink the image to the bounds
+    char *shrunk_pixels = shrink_image(unshrunk_pixels, unshrunk_size,
+        width, height, left, top);
+
+    free(unshrunk_pixels);
+
+    write_tga(filename, shrunk_pixels, width, height);
+
+    free(shrunk_pixels);
 }
