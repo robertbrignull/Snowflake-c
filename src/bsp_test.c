@@ -6,6 +6,8 @@
 
 #include "bsp.h"
 
+#include "bsp_test.h"
+
 void test_basic_distances() {
     printf("Starting test_basicDistances...");
 
@@ -238,12 +240,7 @@ void test_iterator_length() {
     printf("... Done\n");
 }
 
-int main(int argc, char **argv) {
-    // Limit memory usage to around 4GB
-    struct rlimit lim;
-    lim.rlim_cur = lim.rlim_max = 4000000000;
-    setrlimit(RLIMIT_AS, &lim);
-
+void run_bsp_tests() {
     test_basic_distances();
     test_crossing_boundaries();
     test_point_added_twice();
@@ -254,6 +251,4 @@ int main(int argc, char **argv) {
 
     test_iterator();
     test_iterator_length();
-
-    return 0;
 }

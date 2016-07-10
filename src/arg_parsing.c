@@ -7,12 +7,22 @@
 #include "arg_parsing.h"
 
 void print_usage() {
-    printf("Usage: snowflake (--num-particles 100000) [--output out/output.tga]\n\n");
-    printf("Required argumens:\n");
-    printf("  -n --num_particles    The number of particles to simulate\n\n");
-    printf("Optional argumens:\n");
-    printf("  -o --output   Output filename\n");
-    printf("                Default is out/output.tga\n\n");
+    printf("Usage: snowflake mode (--num-particles 100000) [--output out/output.tga]\n");
+    printf("       snowflake --help\n");
+    printf("  where mode is one gen, or bsp_test\n\n");
+
+    printf("Mode gen\n");
+    printf("  generates a snowflake.\n\n");
+    printf("  Required argumens:\n");
+    printf("    -n --num_particles    The number of particles to simulate\n\n");
+    printf("  Optional argumens:\n");
+    printf("    -o --output   Output filename\n");
+    printf("                  Default is out/output.tga\n\n");
+
+    printf("Mode bsp_test\n");
+    printf("  runs test on the BSP implementation.\n\n");
+    printf("  no arguments\n\n");
+
     exit(0);
 }
 
@@ -35,8 +45,8 @@ void check_enough_parameters(char *arg, int argc, int argi, int num_params_expec
 }
 
 int arg_matches(char *actual_arg, char *long_arg, char *short_arg) {
-    return (strcmp(long_arg, actual_arg) == 0 ||
-            strcmp(short_arg, actual_arg) == 0);
+    return ((long_arg != 0 && strcmp(long_arg, actual_arg) == 0) ||
+            (short_arg != 0 && strcmp(short_arg, actual_arg) == 0));
 }
 
 arg_options *parse_args(int argc, char **argv) {
@@ -47,49 +57,63 @@ arg_options *parse_args(int argc, char **argv) {
     arg_options *args = (arg_options*) malloc(sizeof(arg_options));
     CHECK_MEM(args);
 
-    // required args
-    args->num_particles = 0;
-    int num_particles_set = 0;
-
-    // optional args
-    char *default_image_output = "out/output.tga";
-    args->image_output = (char*) malloc(strlen(default_image_output) + 1);
-    CHECK_MEM(args->image_output);
-    strcpy(args->image_output, default_image_output);
-
-    args->log_output = 0;
-
-    int argi = 1;
-    while (argi < argc) {
-        if (arg_matches(argv[argi], "--num-particles", "-n")) {
-            check_enough_parameters(argv[argi], argc, argi, 1);
-            args->num_particles = atoi(argv[argi+1]);
-            num_particles_set = 1;
-            argi += 2;
-        }
-        else if (arg_matches(argv[argi], "--output", "-o")) {
-            check_enough_parameters(argv[argi], argc, argi, 1);
-            args->image_output = (char*) realloc(args->image_output,
-                strlen(argv[argi+1]) + 1);
-            CHECK_MEM(args->image_output);
-            strcpy(args->image_output, argv[argi+1]);
-            argi += 2;
-        }
-        else if (arg_matches(argv[argi], "--log", "-l")) {
-            check_enough_parameters(argv[argi], argc, argi, 1);
-            args->log_output = (char*) realloc(args->log_output,
-                strlen(argv[argi+1]) + 1);
-            CHECK_MEM(args->log_output);
-            strcpy(args->log_output, argv[argi+1]);
-            argi += 2;
-        }
-        else {
-            print_unrecognised_argument(argv[argi]);
-        }
+    if (argc < 2) {
+        print_missing_argument("mode");
     }
 
-    if (!num_particles_set) {
-        print_missing_argument("--num-particles");
+    if (arg_matches(argv[1], "gen", 0)) { // SNOWFLAKE_GEN
+        args->mode = SNOWFLAKE_GEN;
+
+        // required args
+        args->num_particles = 0;
+        int num_particles_set = 0;
+
+        // optional args
+        char *default_image_output = "out/output.tga";
+        args->image_output = (char*) malloc(strlen(default_image_output) + 1);
+        CHECK_MEM(args->image_output);
+        strcpy(args->image_output, default_image_output);
+
+        args->log_output = 0;
+
+        int argi = 2;
+        while (argi < argc) {
+            if (arg_matches(argv[argi], "--num-particles", "-n")) {
+                check_enough_parameters(argv[argi], argc, argi, 1);
+                args->num_particles = atoi(argv[argi+1]);
+                num_particles_set = 1;
+                argi += 2;
+            }
+            else if (arg_matches(argv[argi], "--output", "-o")) {
+                check_enough_parameters(argv[argi], argc, argi, 1);
+                args->image_output = (char*) realloc(args->image_output,
+                    strlen(argv[argi+1]) + 1);
+                CHECK_MEM(args->image_output);
+                strcpy(args->image_output, argv[argi+1]);
+                argi += 2;
+            }
+            else if (arg_matches(argv[argi], "--log", "-l")) {
+                check_enough_parameters(argv[argi], argc, argi, 1);
+                args->log_output = (char*) realloc(args->log_output,
+                    strlen(argv[argi+1]) + 1);
+                CHECK_MEM(args->log_output);
+                strcpy(args->log_output, argv[argi+1]);
+                argi += 2;
+            }
+            else {
+                print_unrecognised_argument(argv[argi]);
+            }
+        }
+
+        if (!num_particles_set) {
+            print_missing_argument("--num-particles");
+        }
+    }
+    else if (arg_matches(argv[1], "bsp_test", 0)) { // BSP_TEST
+        args->mode = BSP_TEST;
+    }
+    else {
+        print_unrecognised_argument(argv[1]);
     }
 
     return args;
@@ -97,8 +121,10 @@ arg_options *parse_args(int argc, char **argv) {
 
 void free_args(arg_options *args) {
     free(args->image_output);
-    if (args->log_output != 0) {
-        free(args->log_output);
+    if (args->mode == SNOWFLAKE_GEN) {
+        if (args->log_output != 0) {
+            free(args->log_output);
+        }
     }
     free(args);
 }
