@@ -6,6 +6,10 @@
 
 #define CHECK_MEM(m) if (m == 0) { printf("Memory allocation failure.\n"); exit(1); }
 
+int min_i(int x, int y);
+
+int max_i(int x, int y);
+
 double max_d(double x, double y);
 
 double min_d(double x, double y);

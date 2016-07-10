@@ -2,6 +2,14 @@
 
 #include "algo.h"
 
+int max_i(int x, int y) {
+    return (x > y) ? x : y;
+}
+
+int min_i(int x, int y) {
+    return (x < y) ? x : y;
+}
+
 double max_d(double x, double y) {
     return (x > y) ? x : y;
 }
