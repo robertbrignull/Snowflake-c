@@ -7,14 +7,24 @@
 #include "arg_parsing.h"
 
 void print_usage() {
-    printf("Usage: snowflake mode (--num-particles 100000) [--output out/output.tga]\n");
+    printf("Usage: snowflake mode [args...]\n");
     printf("       snowflake --help\n");
-    printf("  where mode is one gen, or bsp_test\n\n");
+    printf("  where mode is one gen, render, or bsp_test\n\n");
 
     printf("Mode gen\n");
     printf("  generates a snowflake.\n\n");
     printf("  Required argumens:\n");
     printf("    -n --num_particles    The number of particles to simulate\n\n");
+    printf("  Optional argumens:\n");
+    printf("    -o --output   Output filename\n");
+    printf("                  Default is out/output.tga\n");
+    printf("    -l --log      Output the log of the snowflake\n");
+    printf("                  Default is no logging\n\n");
+
+    printf("Mode render\n");
+    printf("  render a snowflake from a previous run.\n\n");
+    printf("  Required argumens:\n");
+    printf("    -l --log      Input log of a previous snowflake run\n\n");
     printf("  Optional argumens:\n");
     printf("    -o --output   Output filename\n");
     printf("                  Default is out/output.tga\n\n");
