@@ -4,13 +4,12 @@ typedef enum program_mode {SNOWFLAKE_GEN, RENDER, BSP_TEST} program_mode;
 
 typedef struct arg_options_gen {
     int num_particles;
-    char *image_output;
-    char *log_output;
+    char *output;
 } arg_options_gen;
 
 typedef struct arg_options_render {
-    char *image_output;
-    char *log_input;
+    char *output;
+    char *input;
 } arg_options_render;
 
 typedef struct arg_options {

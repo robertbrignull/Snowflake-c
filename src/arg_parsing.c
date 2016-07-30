@@ -16,21 +16,19 @@ void print_usage() {
     printf("  Required argumens:\n");
     printf("    -n --num_particles    The number of particles to simulate\n\n");
     printf("  Optional argumens:\n");
-    printf("    -o --output   Output filename\n");
-    printf("                  Default is out/output.tga\n");
-    printf("    -l --log      Output the log of the snowflake\n");
-    printf("                  Default is no logging\n\n");
+    printf("    -o --output   Output the snowflake as text file\n");
+    printf("                  Default is out/output.flake\n\n");
 
     printf("Mode render\n");
     printf("  render a snowflake from a previous run.\n\n");
     printf("  Required argumens:\n");
-    printf("    -l --log      Input log of a previous snowflake run\n\n");
+    printf("    -i --input    Input of a previous snowflake run as a text file\n\n");
     printf("  Optional argumens:\n");
-    printf("    -o --output   Output filename\n");
+    printf("    -o --output   Output filename for image\n");
     printf("                  Default is out/output.tga\n\n");
 
     printf("Mode bsp_test\n");
-    printf("  runs test on the BSP implementation.\n\n");
+    printf("  runs tests on the BSP implementation.\n\n");
     printf("  no arguments\n\n");
 
     exit(0);
@@ -79,12 +77,10 @@ arg_options *parse_args(int argc, char **argv) {
         int num_particles_set = 0;
 
         // optional args
-        char *default_image_output = "out/output.tga";
-        args->gen.image_output = (char*) malloc(strlen(default_image_output) + 1);
-        CHECK_MEM(args->gen.image_output);
-        strcpy(args->gen.image_output, default_image_output);
-
-        args->gen.log_output = 0;
+        char *default_output = "out/output.flake";
+        args->gen.output = (char*) malloc(strlen(default_output) + 1);
+        CHECK_MEM(args->gen.output);
+        strcpy(args->gen.output, default_output);
 
         int argi = 2;
         while (argi < argc) {
@@ -96,18 +92,10 @@ arg_options *parse_args(int argc, char **argv) {
             }
             else if (arg_matches(argv[argi], "--output", "-o")) {
                 check_enough_parameters(argv[argi], argc, argi, 1);
-                args->gen.image_output = (char*) realloc(args->gen.image_output,
-                    strlen(argv[argi+1]) + 1);
-                CHECK_MEM(args->gen.image_output);
-                strcpy(args->gen.image_output, argv[argi+1]);
-                argi += 2;
-            }
-            else if (arg_matches(argv[argi], "--log", "-l")) {
-                check_enough_parameters(argv[argi], argc, argi, 1);
-                args->gen.log_output = (char*) realloc(args->gen.log_output,
-                    strlen(argv[argi+1]) + 1);
-                CHECK_MEM(args->gen.log_output);
-                strcpy(args->gen.log_output, argv[argi+1]);
+                args->gen.output =
+                    (char*) realloc(args->gen.output, strlen(argv[argi+1]) + 1);
+                CHECK_MEM(args->gen.output);
+                strcpy(args->gen.output, argv[argi+1]);
                 argi += 2;
             }
             else {
@@ -123,32 +111,32 @@ arg_options *parse_args(int argc, char **argv) {
         args->mode = RENDER;
 
         // required args
-        args->render.log_input = 0;
-        int log_input_set = 0;
+        args->render.input = 0;
+        int input_set = 0;
 
         // optional args
-        char *default_image_output = "out/output.tga";
-        args->render.image_output = (char*) malloc(strlen(default_image_output) + 1);
-        CHECK_MEM(args->render.image_output);
-        strcpy(args->render.image_output, default_image_output);
+        char *default_output = "out/output.tga";
+        args->render.output = (char*) malloc(strlen(default_output) + 1);
+        CHECK_MEM(args->render.output);
+        strcpy(args->render.output, default_output);
 
         int argi = 2;
         while (argi < argc) {
             if (arg_matches(argv[argi], "--output", "-o")) {
                 check_enough_parameters(argv[argi], argc, argi, 1);
-                args->render.image_output = (char*) realloc(args->render.image_output,
-                    strlen(argv[argi+1]) + 1);
-                CHECK_MEM(args->render.image_output);
-                strcpy(args->render.image_output, argv[argi+1]);
+                args->render.output =
+                    (char*) realloc(args->render.output, strlen(argv[argi+1]) + 1);
+                CHECK_MEM(args->render.output);
+                strcpy(args->render.output, argv[argi+1]);
                 argi += 2;
             }
-            else if (arg_matches(argv[argi], "--log", "-l")) {
+            else if (arg_matches(argv[argi], "--input", "-i")) {
                 check_enough_parameters(argv[argi], argc, argi, 1);
-                args->render.log_input = (char*) realloc(args->render.log_input,
-                    strlen(argv[argi+1]) + 1);
-                CHECK_MEM(args->render.log_input);
-                strcpy(args->render.log_input, argv[argi+1]);
-                log_input_set = 1;
+                args->render.input =
+                    (char*) realloc(args->render.input, strlen(argv[argi+1]) + 1);
+                CHECK_MEM(args->render.input);
+                strcpy(args->render.input, argv[argi+1]);
+                input_set = 1;
                 argi += 2;
             }
             else {
@@ -156,7 +144,7 @@ arg_options *parse_args(int argc, char **argv) {
             }
         }
 
-        if (!log_input_set) {
+        if (!input_set) {
             print_missing_argument("--log");
         }
     }
@@ -172,19 +160,16 @@ arg_options *parse_args(int argc, char **argv) {
 
 void free_args(arg_options *args) {
     if (args->mode == SNOWFLAKE_GEN) {
-        if (args->gen.image_output != 0) {
-            free(args->gen.image_output);
-        }
-        if (args->gen.log_output != 0) {
-            free(args->gen.log_output);
+        if (args->gen.output != 0) {
+            free(args->gen.output);
         }
     }
     else if (args->mode == RENDER) {
-        if (args->render.image_output != 0) {
-            free(args->render.image_output);
+        if (args->render.output != 0) {
+            free(args->render.output);
         }
-        if (args->render.log_input != 0) {
-            free(args->render.log_input);
+        if (args->render.input != 0) {
+            free(args->render.input);
         }
     }
     free(args);

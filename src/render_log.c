@@ -8,7 +8,7 @@
 
 #include "render_log.h"
 
-void find_bounds_log(FILE *log, int *BN, int *BS, int *BW, int *BE) {
+void find_bounds(FILE *log, int *BN, int *BS, int *BW, int *BE) {
     int bn = 0;
     int bs = 0;
     int bw = 0;
@@ -33,9 +33,9 @@ void find_bounds_log(FILE *log, int *BN, int *BS, int *BW, int *BE) {
     *BE = be;
 }
 
-char *generate_image_log(FILE *log, int *w, int *h) {
+char *generate_image(FILE *log, int *w, int *h) {
     int BN, BS, BW, BE;
-    find_bounds_log(log, &BN, &BS, &BW, &BE);
+    find_bounds(log, &BN, &BS, &BW, &BE);
 
     int width = BE - BW + 1;
     int height = BS - BN + 1;
@@ -68,7 +68,7 @@ char *generate_image_log(FILE *log, int *w, int *h) {
 void render_log(FILE *log, char *filename) {
     // Write the flake to a 2D array of pixels
     int width, height;
-    char *P = generate_image_log(log, &width, &height);
+    char *P = generate_image(log, &width, &height);
 
     write_tga(filename, P, width, height);
 

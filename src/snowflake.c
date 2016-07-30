@@ -6,7 +6,6 @@
 #include "arg_parsing.h"
 #include "bsp.h"
 #include "bsp_test.h"
-#include "render_bsp.h"
 #include "render_log.h"
 #include "snowflake_gen.h"
 
@@ -22,20 +21,16 @@ int main(int argc, char **argv) {
 
     if (args->mode == SNOWFLAKE_GEN) {
         FILE *log = 0;
-        if (args->gen.log_output != 0) {
-            log = fopen(args->gen.log_output, "w");
+        if (args->gen.output != 0) {
+            log = fopen(args->gen.output, "w");
         }
 
-        bsp_t *b = create_snowflake(args->gen.num_particles, log);
-
-        render_bsp(b, args->gen.image_output);
-
-        bsp_destroy(b);
+        create_snowflake(args->gen.num_particles, log);
     }
     else if (args->mode == RENDER) {
-        FILE *log = fopen(args->render.log_input, "r");
+        FILE *log = fopen(args->render.input, "r");
 
-        render_log(log, args->render.image_output);
+        render_log(log, args->render.output);
     }
     else if (args->mode == BSP_TEST) {
         run_bsp_tests();

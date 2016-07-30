@@ -7,7 +7,7 @@
 
 #include "snowflake_gen.h"
 
-bsp_t *create_snowflake(int N, FILE *log) {
+void create_snowflake(int N, FILE *log) {
     double max_size = 50.0;
 
     bsp_t *b = bsp_new(max_size);
@@ -113,5 +113,5 @@ bsp_t *create_snowflake(int N, FILE *log) {
         destruction_boundary = max_d(destruction_boundary, dis + destruction_standoff);
     }
 
-    return b;
+    bsp_destroy(b);
 }
