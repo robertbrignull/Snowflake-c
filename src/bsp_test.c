@@ -13,15 +13,14 @@ void test_basic_distances() {
 
     bsp_t *b = bsp_new(100.0);
 
-    assert(bsp_find_nearest(b, 0.0, 0.0).d == 0.0);
+    assert(bsp_find_nearest(b, 0.0, 0.0).d == -1.0);
 
-    bsp_add_point(b, 51.0, 52.0);
-
-    bsp_result d = bsp_find_nearest(b, 50.0, 50.0);
+    bsp_add_point(b, 1.0, 2.0);
+    bsp_result d = bsp_find_nearest(b, 0.0, 0.0);
     assert(d.d > 2.236 && d.d < 2.237);
 
-    bsp_add_point(b, 49.0, 50.0);
-    d = bsp_find_nearest(b, 50.0, 50.0);
+    bsp_add_point(b, -1.0, 0.0);
+    d = bsp_find_nearest(b, 0.0, 0.0);
     assert(d.d > 0.999 && d.d < 1.001);
 
     bsp_destroy(b);
@@ -34,7 +33,7 @@ void test_crossing_boundaries() {
 
     bsp_t *b = bsp_new(100.0);
 
-    assert(bsp_find_nearest(b, 50.0, 50.0).d == 0.0);
+    assert(bsp_find_nearest(b, 50.0, 50.0).d == -1.0);
 
     bsp_add_point(b, 45.0, 26.0);
     bsp_add_point(b, 49.0, 24.0);
@@ -52,7 +51,7 @@ void test_point_added_twice() {
 
     bsp_t *b = bsp_new(100.0);
 
-    assert(bsp_find_nearest(b, 50.0, 50.0).d == 0.0);
+    assert(bsp_find_nearest(b, 50.0, 50.0).d == -1.0);
 
     bsp_add_point(b, 40.0, 40.0);
     bsp_add_point(b, 40.0, 40.0);
@@ -70,7 +69,7 @@ void test_empty_region() {
 
     bsp_t *b = bsp_new(100.0);
 
-    assert(bsp_find_nearest(b, 50.0, 50.0).d == 0.0);
+    assert(bsp_find_nearest(b, 50.0, 50.0).d == -1.0);
 
     bsp_add_point(b, 25.0, 25.0);
     bsp_add_point(b, 25.0, 60.0);

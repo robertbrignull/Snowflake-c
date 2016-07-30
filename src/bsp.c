@@ -7,9 +7,9 @@
 
 // Declare private functions
 int bsp_new_node(bsp_t *b, bsp_type_e type, int parent);
-void bsp_add_point_impl(bsp_t *b, int node_index, double point_x, double point_y, double node_x, double node_y, double node_width, double node_height, bsp_type_e last_type);
-bsp_result bsp_find_nearest_impl(bsp_t *b, int node_index, double point_x, double point_y, double node_x, double node_y, double node_width, double node_height);
-void bsp_print_impl(bsp_t *b, int node_index, double node_x, double node_y, double node_width, double node_height);
+void bsp_add_point_impl(bsp_t *b, int node_index, double point_x, double point_y, double node_x, double node_y, double node_size);
+bsp_result bsp_find_nearest_impl(bsp_t *b, int node_index, double point_x, double point_y, double node_x, double node_y, double node_size);
+void bsp_print_impl(bsp_t *b, int node_index, double node_x, double node_y, double node_size);
 
 
 
@@ -56,33 +56,58 @@ void bsp_add_point(bsp_t *b, double x, double y) {
         return;
     }
 
-    bsp_add_point_impl(b, 0, x, y, -b->size, -b->size, b->size * 2, b->size * 2, BSP_HLINE);
+    bsp_add_point_impl(b, 0, x, y, -b->size, -b->size, b->size * 2);
 }
 
 // Returns the distance to the nearest point in the tree
 bsp_result bsp_find_nearest(bsp_t *b, double x, double y) {
-    return bsp_find_nearest_impl(b, 0, x, y, -b->size, -b->size, b->size * 2, b->size * 2);
+    return bsp_find_nearest_impl(b, 0, x, y, -b->size, -b->size, b->size * 2);
 }
 
 // For testing, prints a tree
 void bsp_print(bsp_t *b) {
-    bsp_print_impl(b, 0, -b->size, -b->size, b->size * 2, b->size * 2);
+    bsp_print_impl(b, 0, -b->size, -b->size, b->size * 2);
+}
+
+void bsp_iterator_find_next(bsp_iterator *i, int last) {
+    if (i->current == -1) {
+        return;
+    }
+
+    bsp_node n = i->b->nodes[i->current];
+    if (n.type == BSP_CROSS) {
+        int this = i->current;
+        if (n.NE == last) {
+            i->current = n.parent;
+        } else if (n.SE == last) {
+            i->current = n.NE;
+        } else if (n.NW == last) {
+            i->current = n.SE;
+        } else if (n.SW == last) {
+            i->current = n.NW;
+        } else {
+            i->current = n.SW;
+        }
+        bsp_iterator_find_next(i, this);
+    }
+    else if (n.type == BSP_EMPTY) {
+        int this = i->current;
+        i->current = n.parent;
+        bsp_iterator_find_next(i, this);
+    }
 }
 
 bsp_iterator bsp_iterator_new(bsp_t *b) {
     bsp_iterator i;
     i.b = b;
 
-    if (i.b->nodes[0].type == BSP_EMPTY) {
+    i.current = 0;
+    bsp_node n = i.b->nodes[i.current];
+    if (n.type == BSP_EMPTY) {
         i.current = -1;
     }
-    else {
-        i.current = 0;
-        bsp_node n = i.b->nodes[i.current];
-        while (n.type == BSP_VLINE || n.type == BSP_HLINE) {
-            i.current = (i.b->nodes[n.left].type != BSP_EMPTY) ? n.left : n.right;
-            n = i.b->nodes[i.current];
-        }
+    else if (n.type == BSP_CROSS) {
+        bsp_iterator_find_next(&i, -1);
     }
 
     return i;
@@ -102,25 +127,10 @@ bsp_result bsp_iterator_next(bsp_iterator *i) {
     r.x = i->b->nodes[i->current].x;
     r.y = i->b->nodes[i->current].y;
 
-    int last = i->current;
     bsp_node n = i->b->nodes[i->current];
-    do {
-        last = i->current;
-        i->current = n.parent;
-        if (i->current != -1) {
-            n = i->b->nodes[i->current];
-        }
-    } while (i->current != -1 && (n.right == last || i->b->nodes[n.right].type == BSP_EMPTY));
-
-    if (i->current != -1) {
-        i->current = n.right;
-        n = i->b->nodes[i->current];
-
-        while (n.type == BSP_VLINE || n.type == BSP_HLINE) {
-            i->current = (i->b->nodes[n.left].type != BSP_EMPTY) ? n.left : n.right;
-            n = i->b->nodes[i->current];
-        }
-    }
+    int this = i->current;
+    i->current = n.parent;
+    bsp_iterator_find_next(i, this);
 
     return r;
 }
@@ -144,97 +154,136 @@ int bsp_new_node(bsp_t *b, bsp_type_e type, int parent) {
 }
 
 // Private method, adds a point to the tree
-void bsp_add_point_impl(bsp_t *b, int node_index, double point_x, double point_y, double node_x, double node_y, double node_width, double node_height, bsp_type_e last_type) {
-    bsp_node *node = &b->nodes[node_index];
+void bsp_add_point_impl(bsp_t *b, int node_index, double point_x, double point_y, double node_x, double node_y, double node_size) {
+    bsp_node node = b->nodes[node_index];
 
-    if (node->type == BSP_HLINE) {
-        if (point_y < node_y + node_height / 2) {
-            bsp_add_point_impl(b, node->left, point_x, point_y, node_x, node_y, node_width, node_height / 2, BSP_HLINE);
+    if (node.type == BSP_CROSS) {
+        int south = point_y < node_y + node_size / 2;
+        int west = point_x < node_x + node_size / 2;
+
+        if (south && west) {
+            bsp_add_point_impl(b, node.SW, point_x, point_y, node_x, node_y, node_size / 2);
         }
-        else {
-            bsp_add_point_impl(b, node->right, point_x, point_y, node_x, node_y + node_height / 2, node_width, node_height / 2, BSP_HLINE);
+        else if (south && !west) {
+            bsp_add_point_impl(b, node.SE, point_x, point_y, node_x + node_size / 2, node_y, node_size / 2);
+        }
+        else if (!south && west) {
+            bsp_add_point_impl(b, node.NW, point_x, point_y, node_x, node_y + node_size / 2, node_size / 2);
+        }
+        else if (!south && !west) {
+            bsp_add_point_impl(b, node.NE, point_x, point_y, node_x + node_size / 2, node_y + node_size / 2, node_size / 2);
         }
     }
-    else if (node->type == BSP_VLINE) {
-        if (point_x < node_x + node_width / 2) {
-            bsp_add_point_impl(b, node->left, point_x, point_y, node_x, node_y, node_width / 2, node_height, BSP_VLINE);
-        }
-        else {
-            bsp_add_point_impl(b, node->right, point_x, point_y, node_x + node_width / 2, node_y, node_width / 2, node_height, BSP_VLINE);
-        }
-    }
-    else if (node->type == BSP_POINT) {
-        if (node->x != point_x || node->y != point_y) {
-            node->type = (last_type == BSP_HLINE) ? BSP_VLINE : BSP_HLINE;
+    else if (node.type == BSP_POINT) {
+        if (node.x != point_x || node.y != point_y) {
+            double old_point_x = node.x;
+            double old_point_y = node.y;
 
-            double old_point_x = node->x;
-            double old_point_y = node->y;
+            int SW = bsp_new_node(b, BSP_EMPTY, node_index);
+            int SE = bsp_new_node(b, BSP_EMPTY, node_index);
+            int NW = bsp_new_node(b, BSP_EMPTY, node_index);
+            int NE = bsp_new_node(b, BSP_EMPTY, node_index);
 
-            int l = bsp_new_node(b, BSP_EMPTY, node_index);
-            int r = bsp_new_node(b, BSP_EMPTY, node_index);
-            
-            // need to re-get the pointer to node now as bsp_new_node may have changed it by resizing the array
-            node = &b->nodes[node_index];
+            node.type = BSP_CROSS;
+            node.SW = SW;
+            node.SE = SE;
+            node.NW = NW;
+            node.NE = NE;
+            b->nodes[node_index] = node;
 
-            node->left = l;
-            node->right = r;
-
-            bsp_add_point_impl(b, node_index, point_x, point_y, node_x, node_y, node_width, node_height, last_type);
-            bsp_add_point_impl(b, node_index, old_point_x, old_point_y, node_x, node_y, node_width, node_height, last_type);
+            bsp_add_point_impl(b, node_index, point_x, point_y, node_x, node_y, node_size);
+            bsp_add_point_impl(b, node_index, old_point_x, old_point_y, node_x, node_y, node_size);
         }
     }
     else {
-        node->type = BSP_POINT;
-        node->x = point_x;
-        node->y = point_y;
+        node.type = BSP_POINT;
+        node.x = point_x;
+        node.y = point_y;
+        b->nodes[node_index] = node;
     }
 }
 
-bsp_result min_bsp_result(bsp_result b1, bsp_result b2) {
-    return (b2.d == 0.0 || (b1.d != 0.0 && b1.d < b2.d)) ? b1 : b2;
+bsp_result min_bsp_result(bsp_result r1, bsp_result r2) {
+    return (r1.d == -1.0 || (r2.d != -1.0 && r2.d < r1.d)) ? r2 : r1;
 }
 
-bsp_result bsp_find_nearest_impl(bsp_t *b, int node_index, double point_x, double point_y, double node_x, double node_y, double node_width, double node_height) {
+bsp_result bsp_find_nearest_impl(bsp_t *b, int node_index, double point_x, double point_y, double node_x, double node_y, double node_size) {
     bsp_node node = b->nodes[node_index];
 
-    if (node.type == BSP_VLINE) {
-        if (point_x < node_x + node_width / 2) {
-            bsp_result d = bsp_find_nearest_impl(b, node.left, point_x, point_y, node_x, node_y, node_width / 2, node_height);
+    if (node.type == BSP_CROSS) {
+        double dx = point_x - node_x - node_size / 2;
+        double dy = point_y - node_y - node_size / 2;
+        double adx = abs_d(dx);
+        double ady = abs_d(dy);
+        int N_x_modifier = (dx >= 0) ? 1 : 0;
+        int N_y_modifier = (dy >= 0) ? 1 : 0;
 
-            if (d.d != 0.0 && d.d <= node_x + node_width / 2 - point_x) {
-                return d;
+        //   N = near quadrant (the one the point is in)
+        //   H = the adjacent quadrant horizontally
+        //   V = the adjacent quadrant vertically
+        //   F = the far quadrant that is not adjacent
+        int N, H, V, F;
+
+        if (dx < 0 && dy < 0) {
+            N = node.SW;
+            H = node.SE;
+            V = node.NW;
+            F = node.NE;
+        }
+        else if (dx >= 0 && dy < 0) {
+            N = node.SE;
+            H = node.SW;
+            V = node.NE;
+            F = node.NW;
+        }
+        else if (dx < 0 && dy >= 0) {
+            N = node.NW;
+            H = node.NE;
+            V = node.SW;
+            F = node.SE;
+        }
+        else { // dx >= 0 && dy >= 0
+            N = node.NE;
+            H = node.NW;
+            V = node.SE;
+            F = node.SW;
+        }
+
+        bsp_result r = bsp_find_nearest_impl(b, N, point_x, point_y, node_x + node_size / 2 * N_x_modifier, node_y + node_size / 2 * N_y_modifier, node_size / 2);
+
+        if (r.d != -1.0 && r.d <= adx && r.d <= ady) {
+            return r;
+        }
+
+        if (adx < ady) {
+            r = min_bsp_result(r, bsp_find_nearest_impl(b, H, point_x, point_y, node_x + node_size / 2 * (1 - N_x_modifier), node_y + node_size / 2 * N_y_modifier, node_size / 2));
+
+            if (r.d != -1.0 && r.d <= ady) {
+                return r;
             }
-            
-            return min_bsp_result(d, bsp_find_nearest_impl(b, node.right, point_x, point_y, node_x + node_width / 2, node_y, node_width / 2, node_height));
+
+            r = min_bsp_result(r, bsp_find_nearest_impl(b, V, point_x, point_y, node_x + node_size / 2 * N_x_modifier, node_y + node_size / 2 * (1 - N_y_modifier), node_size / 2));
+
+            if (r.d != -1.0 && r.d <= dist_origin_d(dx, dy)) {
+                return r;
+            }
+
+            return min_bsp_result(r, bsp_find_nearest_impl(b, F, point_x, point_y, node_x + node_size / 2 * (1 - N_x_modifier), node_y + node_size / 2 * (1 - N_y_modifier), node_size / 2));
         }
         else {
-            bsp_result d = bsp_find_nearest_impl(b, node.right, point_x, point_y, node_x + node_width / 2, node_y, node_width / 2, node_height);
+            r = min_bsp_result(r, bsp_find_nearest_impl(b, V, point_x, point_y, node_x + node_size / 2 * N_x_modifier, node_y + node_size / 2 * (1 - N_y_modifier), node_size / 2));
 
-            if (d.d != 0.0 && d.d <= point_x - node_x - node_width / 2) {
-                return d;
+            if (r.d != -1.0 && r.d <= adx) {
+                return r;
             }
-            
-            return min_bsp_result(d, bsp_find_nearest_impl(b, node.left, point_x, point_y, node_x, node_y, node_width / 2, node_height));
-        }
-    }
-    else if (node.type == BSP_HLINE) {
-        if (point_y < node_y + node_height / 2) {
-            bsp_result d = bsp_find_nearest_impl(b, node.left, point_x, point_y, node_x, node_y, node_width, node_height / 2);
 
-            if (d.d != 0.0 && d.d <= node_y + node_height / 2 - point_y) {
-                return d;
-            }
-            
-            return min_bsp_result(d, bsp_find_nearest_impl(b, node.right, point_x, point_y, node_x, node_y + node_height / 2, node_width, node_height / 2));
-        }
-        else {
-            bsp_result d = bsp_find_nearest_impl(b, node.right, point_x, point_y, node_x, node_y + node_height / 2, node_width, node_height / 2);
+            r = min_bsp_result(r, bsp_find_nearest_impl(b, H, point_x, point_y, node_x + node_size / 2 * (1 - N_x_modifier), node_y + node_size / 2 * N_y_modifier, node_size / 2));
 
-            if (d.d != 0.0 && d.d <= point_y - node_y - node_height / 2) {
-                return d;
+            if (r.d != -1.0 && r.d <= dist_origin_d(dx, dy)) {
+                return r;
             }
-            
-            return min_bsp_result(d, bsp_find_nearest_impl(b, node.left, point_x, point_y, node_x, node_y, node_width, node_height / 2));
+
+            return min_bsp_result(r, bsp_find_nearest_impl(b, F, point_x, point_y, node_x + node_size / 2 * (1 - N_x_modifier), node_y + node_size / 2 * (1 - N_y_modifier), node_size / 2));
         }
     }
     else if (node.type == BSP_POINT) {
@@ -246,36 +295,34 @@ bsp_result bsp_find_nearest_impl(bsp_t *b, int node_index, double point_x, doubl
     }
     else {
         bsp_result r;
-        r.x = r.y = r.d = 0.0;
+        r.x = r.y = 0.0;
+        r.d = -1.0;
         return r;
     }
 }
 
-void bsp_print_impl(bsp_t *b, int node_index, double node_x, double node_y, double node_width, double node_height) {
+void bsp_print_impl(bsp_t *b, int node_index, double node_x, double node_y, double node_size) {
     bsp_node node = b->nodes[node_index];
 
-    if (node.type == BSP_VLINE) {
-        printf("VLine(%d, (%.1f, %.1f, %.1f, %.1f), ", node_index, node_x, node_y, node_width, node_height);
+    if (node.type == BSP_CROSS) {
+        printf("Cross(%d, (%.1f, %.1f, %.1f), ", node_index, node_x, node_y, node_size);
         
-        bsp_print_impl(b, node.left, node_x, node_y, node_width / 2, node_height);
+        bsp_print_impl(b, node.SW, node_x, node_y, node_size / 2);
+        printf(", ");
+        
+        bsp_print_impl(b, node.SE, node_x + node_size / 2, node_y, node_size / 2);
+        printf(", ");
+        
+        bsp_print_impl(b, node.NW, node_x, node_y + node_size / 2, node_size / 2);
         printf(", ");
 
-        bsp_print_impl(b, node.right, node_x + node_width / 2, node_y, node_width / 2, node_height);
-        printf(")");
-    }
-    else if (node.type == BSP_HLINE) {
-        printf("HLine(%d, (%.1f, %.1f, %.1f, %.1f), ", node_index, node_x, node_y, node_width, node_height);
-        
-        bsp_print_impl(b, node.left, node_x, node_y, node_width, node_height / 2);
-        printf(", ");
-
-        bsp_print_impl(b, node.right, node_x, node_y + node_height / 2, node_width, node_height / 2);
+        bsp_print_impl(b, node.NE, node_x + node_size / 2, node_y + node_size / 2, node_size / 2);
         printf(")");
     }
     else if (node.type == BSP_POINT) {
-        printf("Point(%d, (%.1f, %.1f, %.1f, %.1f), %.1f, %.1f)", node_index, node_x, node_y, node_width, node_height, node.x, node.y);
+        printf("Point(%d, (%.1f, %.1f, %.1f), %.1f, %.1f)", node_index, node_x, node_y, node_size, node.x, node.y);
     }
     else {
-        printf("Empty(%d, (%.1f, %.1f, %.1f, %.1f))", node_index, node_x, node_y, node_width, node_height);
+        printf("Empty(%d, (%.1f, %.1f, %.1f))", node_index, node_x, node_y, node_size);
     }
 }

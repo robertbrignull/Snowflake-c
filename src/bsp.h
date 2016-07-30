@@ -1,6 +1,6 @@
 #pragma once
 
-typedef enum bsp_type_e {BSP_HLINE, BSP_VLINE, BSP_POINT, BSP_EMPTY} bsp_type_e;
+typedef enum bsp_type_e {BSP_CROSS, BSP_POINT, BSP_EMPTY} bsp_type_e;
 
 typedef struct bsp_node {
     // The type of this node, determines how to use the union below
@@ -16,10 +16,10 @@ typedef struct bsp_node {
             double x, y;
         };
 
-        // If this node is a line then this contains
+        // If this node is a cross then this contains
         // the indexes of its children
         struct {
-            int left, right;
+            int SW, NW, SE, NE;
         };
     };
 } bsp_node;
