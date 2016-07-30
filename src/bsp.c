@@ -164,24 +164,32 @@ int bsp_new_node(bsp_t *b, bsp_type_e type, int parent) {
 void bsp_add_point_impl(bsp_t *b, int node_index, double node_x, double node_y, double node_size) {
     bsp_node node = b->nodes[node_index];
 
-    if (node.type == BSP_CROSS) {
+    while (node.type == BSP_CROSS) {
         int south = point_y < node_y + node_size / 2;
         int west = point_x < node_x + node_size / 2;
 
         if (south && west) {
-            bsp_add_point_impl(b, node.SW, node_x, node_y, node_size / 2);
+            node_index = node.SW;
         }
         else if (south && !west) {
-            bsp_add_point_impl(b, node.SE, node_x + node_size / 2, node_y, node_size / 2);
+            node_index = node.SE;
+            node_x += node_size / 2;
         }
         else if (!south && west) {
-            bsp_add_point_impl(b, node.NW, node_x, node_y + node_size / 2, node_size / 2);
+            node_index = node.NW;
+            node_y += node_size / 2;
         }
         else if (!south && !west) {
-            bsp_add_point_impl(b, node.NE, node_x + node_size / 2, node_y + node_size / 2, node_size / 2);
+            node_index = node.NE;
+            node_x += node_size / 2;
+            node_y += node_size / 2;
         }
+
+        node_size = node_size / 2;
+        node = b->nodes[node_index];
     }
-    else if (node.type == BSP_POINT) {
+
+    if (node.type == BSP_POINT) {
         if (node.x != point_x || node.y != point_y) {
             double old_point_x = node.x;
             double old_point_y = node.y;
