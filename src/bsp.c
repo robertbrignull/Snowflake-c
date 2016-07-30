@@ -22,14 +22,14 @@ bsp_t *bsp_new(double S) {
     bsp_t *b = (bsp_t*) malloc(sizeof(bsp_t));
     CHECK_MEM(b);
 
-    b->S = S;
-    b->size = 1000;
-    b->nodes = (bsp_node*) malloc(sizeof(bsp_node) * b->size);
+    b->size = S;
+    b->nodes_size = 1000;
+    b->nodes = (bsp_node*) malloc(sizeof(bsp_node) * b->nodes_size);
     CHECK_MEM(b->nodes);
 
     b->nodes[0].type = BSP_EMPTY;
     b->nodes[0].parent = -1;
-    b->numNodes = 1;
+    b->num_nodes = 1;
 
     return b;
 }
@@ -42,7 +42,7 @@ void bsp_destroy(bsp_t *b) {
 
 // Increases the size of the bsp, returning a new one
 bsp_t *bsp_increase_size(bsp_t *b) {
-    bsp_t *new_b = bsp_new(b->S * 2.0);
+    bsp_t *new_b = bsp_new(b->size * 2.0);
 
     bsp_iterator it = bsp_iterator_new(b);
     while (bsp_iterator_has_next(it)) {
@@ -55,17 +55,17 @@ bsp_t *bsp_increase_size(bsp_t *b) {
 
 // Adds a point to the tree
 void bsp_add_point(bsp_t *b, double x, double y) {
-    if (x <= -b->S || x >= b->S || y <= -b->S || y >= b->S) {
+    if (x <= -b->size || x >= b->size || y <= -b->size || y >= b->size) {
         printf("Cannot add (%f, %f), outside of bsp region.\n", x, y);
         return;
     }
 
     px = x;
     py = y;
-    ox = -b->S;
-    oy = -b->S;
-    w = b->S * 2;
-    h = b->S * 2;
+    ox = -b->size;
+    oy = -b->size;
+    w = b->size * 2;
+    h = b->size * 2;
     last_type = BSP_HLINE;
 
     bsp_add_point_impl(b, 0);
@@ -75,20 +75,20 @@ void bsp_add_point(bsp_t *b, double x, double y) {
 bsp_result bsp_find_nearest(bsp_t *b, double x, double y) {
     px = x;
     py = y;
-    ox = -b->S;
-    oy = -b->S;
-    w = b->S * 2;
-    h = b->S * 2;
+    ox = -b->size;
+    oy = -b->size;
+    w = b->size * 2;
+    h = b->size * 2;
 
     return bsp_find_nearest_impl(b, 0);
 }
 
 // For testing, prints a tree
 void bsp_print(bsp_t *b) {
-    ox = -b->S;
-    oy = -b->S;
-    w = b->S * 2;
-    h = b->S * 2;
+    ox = -b->size;
+    oy = -b->size;
+    w = b->size * 2;
+    h = b->size * 2;
 
     bsp_print_impl(b, 0);
 }
@@ -153,16 +153,16 @@ bsp_result bsp_iterator_next(bsp_iterator *i) {
 
 // Private method, creates a new bsp tree node
 int bsp_new_node(bsp_t *b, bsp_type_e type, int parent) {
-    if (b->numNodes == b->size) {
-        b->size *= 2;
-        b->nodes = (bsp_node*) realloc(b->nodes, sizeof(bsp_node) * b->size);
+    if (b->num_nodes == b->nodes_size) {
+        b->nodes_size *= 2;
+        b->nodes = (bsp_node*) realloc(b->nodes, sizeof(bsp_node) * b->nodes_size);
         CHECK_MEM(b->nodes);
     }
 
-    int i = b->numNodes;
+    int i = b->num_nodes;
     b->nodes[i].type = type;
     b->nodes[i].parent = parent;
-    b->numNodes++;
+    b->num_nodes++;
 
     return i;
 }

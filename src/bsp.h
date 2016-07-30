@@ -26,16 +26,16 @@ typedef struct bsp_node {
 
 typedef struct bsp_t {
     // The size of this bsp tree
-    double S;
+    double size;
 
     // A dynamically allocated array of nodes, with the root at index 1
     bsp_node *nodes;
 
     // The size of the nodes array
-    int size;
+    int nodes_size;
 
     // The number of nodes in the array
-    int numNodes;
+    int num_nodes;
 } bsp_t;
 
 typedef struct bsp_result {

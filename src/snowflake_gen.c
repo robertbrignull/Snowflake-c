@@ -96,7 +96,7 @@ bsp_t *create_snowflake(int N, FILE *log) {
             bsp_destroy(b);
             
             b = newB;
-            max_size = b->S;
+            max_size = b->size;
         }
 
         // add the new point
