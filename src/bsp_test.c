@@ -170,75 +170,6 @@ void test_random() {
     printf("... Done\n");
 }
 
-void test_iterator() {
-    printf("Starting test_iterator");
-
-    bsp_t *b = bsp_new(40.0);
-
-    double points[3] = { 10.0, 20.0, 30.0 };
-    int found[3] = { 0, 0, 0 };
-
-    for (int i = 0; i < 3; i++) {
-        bsp_add_point(b, points[i], points[i]);
-    }
-
-    bsp_iterator it = bsp_iterator_new(b);
-
-    for (int i = 0; i < 3; i++) {
-        assert (bsp_iterator_has_next(it) != 0);
-        bsp_result r = bsp_iterator_next(&it);
-
-        int f = 0;
-        for (int j = 0; j < 3; j++) {
-            if (r.x == points[j]) {
-                assert (found[j] == 0);
-                assert (f == 0);
-                found[j] = 1;
-                f = 1;
-            }
-        }
-        assert (f == 1);
-    }
-
-    assert (bsp_iterator_has_next(it) == 0);
-
-    for (int i = 0; i < 3; i++) {
-        assert (found[i] == 1);
-    }
-
-    bsp_destroy(b);
-
-    printf("... Done\n");
-}
-
-void test_iterator_length() {
-    printf("Starting test_iteratorLength");
-
-    bsp_t *b = bsp_new(40.0);
-
-    srand(42);
-
-    int n = 10000;
-
-    for (int i = 0; i < n; i++) {
-        bsp_add_point(b, 1.0 * rand() / RAND_MAX, 1.0 * rand() / RAND_MAX);
-    }
-
-    bsp_iterator it = bsp_iterator_new(b);
-
-    int k = 0;
-    while (bsp_iterator_has_next(it) != 0) {
-        bsp_iterator_next(&it);
-        k++;
-    }
-
-    assert (k == n);
-
-    bsp_destroy(b);
-
-    printf("... Done\n");
-}
-
 void run_bsp_tests() {
     test_basic_distances();
     test_crossing_boundaries();
@@ -247,7 +178,4 @@ void run_bsp_tests() {
 
     test_performance();
     test_random();
-
-    test_iterator();
-    test_iterator_length();
 }

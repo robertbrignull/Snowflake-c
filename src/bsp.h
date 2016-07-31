@@ -46,14 +46,6 @@ typedef struct bsp_result {
     double x, y;
 } bsp_result;
 
-typedef struct bsp_iterator {
-    // The bsp tree we're operating on
-    bsp_t *b;
-
-    // Which node are we on currently
-    int current;
-} bsp_iterator;
-
 
 
 // Creates an empty bsp tree with the given size
@@ -73,8 +65,3 @@ bsp_result bsp_find_nearest(bsp_t *b, double x, double y);
 
 // For testing, prints a bsp tree
 void bsp_print(bsp_t *b);
-
-// Allows you to iterate through a bsp tree
-bsp_iterator bsp_iterator_new(bsp_t *b);
-int bsp_iterator_has_next(bsp_iterator i);
-bsp_result bsp_iterator_next(bsp_iterator *i);

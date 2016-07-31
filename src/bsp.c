@@ -43,10 +43,11 @@ void bsp_destroy(bsp_t *b) {
 bsp_t *bsp_increase_size(bsp_t *b) {
     bsp_t *new_b = bsp_new(b->size * 2.0);
 
-    bsp_iterator it = bsp_iterator_new(b);
-    while (bsp_iterator_has_next(it)) {
-        bsp_result r = bsp_iterator_next(&it);
-        bsp_add_point(new_b, r.x, r.y);
+    for (int i = 0; i < b->num_nodes; i++) {
+        bsp_node node = b->nodes[i];
+        if (node.type == BSP_POINT) {
+            bsp_add_point(new_b, node.x, node.y);
+        }
     }
 
     return new_b;
@@ -74,72 +75,6 @@ bsp_result bsp_find_nearest(bsp_t *b, double x, double y) {
 // For testing, prints a tree
 void bsp_print(bsp_t *b) {
     bsp_print_impl(b, 0, -b->size, -b->size, b->size * 2);
-}
-
-void bsp_iterator_find_next(bsp_iterator *i, int last) {
-    if (i->current == -1) {
-        return;
-    }
-
-    bsp_node n = i->b->nodes[i->current];
-    if (n.type == BSP_CROSS) {
-        int this = i->current;
-        if (n.NE == last) {
-            i->current = n.parent;
-        } else if (n.SE == last) {
-            i->current = n.NE;
-        } else if (n.NW == last) {
-            i->current = n.SE;
-        } else if (n.SW == last) {
-            i->current = n.NW;
-        } else {
-            i->current = n.SW;
-        }
-        bsp_iterator_find_next(i, this);
-    }
-    else if (n.type == BSP_EMPTY) {
-        int this = i->current;
-        i->current = n.parent;
-        bsp_iterator_find_next(i, this);
-    }
-}
-
-bsp_iterator bsp_iterator_new(bsp_t *b) {
-    bsp_iterator i;
-    i.b = b;
-
-    i.current = 0;
-    bsp_node n = i.b->nodes[i.current];
-    if (n.type == BSP_EMPTY) {
-        i.current = -1;
-    }
-    else if (n.type == BSP_CROSS) {
-        bsp_iterator_find_next(&i, -1);
-    }
-
-    return i;
-}
-
-int bsp_iterator_has_next(bsp_iterator i) {
-    return (i.current != -1 && i.b->nodes[i.current].type == BSP_POINT);
-}
-
-bsp_result bsp_iterator_next(bsp_iterator *i) {
-    if (i->current == -1) {
-        printf("Trying to use invalid iterator.\n");
-        exit(1);
-    }
-
-    bsp_result r;
-    r.x = i->b->nodes[i->current].x;
-    r.y = i->b->nodes[i->current].y;
-
-    bsp_node n = i->b->nodes[i->current];
-    int this = i->current;
-    i->current = n.parent;
-    bsp_iterator_find_next(i, this);
-
-    return r;
 }
 
 
