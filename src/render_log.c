@@ -54,6 +54,10 @@ image_def create_array(FILE *log, int colorize) {
     image.left = BW;
     image.top = BN;
 
+    // make the width and height a multiple of 2 to play nicely with ffmpeg
+    if (image.width % 2 == 1) image.width += 1;
+    if (image.height % 2 == 1) image.height += 1;
+
     image.P_size = image.width * image.height * bytes_per_pixel(colorize);
     image.P = (char*) malloc(image.P_size);
     CHECK_MEM(image.P);
