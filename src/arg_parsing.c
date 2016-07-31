@@ -130,6 +130,9 @@ arg_options *parse_args(int argc, char **argv) {
 
         args->render.movie = 0;
 
+        args->render.num_frames = 0;
+        int num_frames_set = 0;
+
         int argi = 2;
         while (argi < argc) {
             if (arg_matches(argv[argi], "--output", "-o")) {
@@ -157,6 +160,12 @@ arg_options *parse_args(int argc, char **argv) {
                 args->render.movie = 1;
                 argi += 1;
             }
+            else if (arg_matches(argv[argi], "--frames", "-f")) {
+                check_enough_parameters(argv[argi], argc, argi, 1);
+                args->render.num_frames = atoi(argv[argi+1]);
+                num_frames_set = 1;
+                argi += 2;
+            }
             else {
                 print_unrecognised_argument(argv[argi]);
             }
@@ -164,6 +173,10 @@ arg_options *parse_args(int argc, char **argv) {
 
         if (!input_set) {
             print_missing_argument("--log");
+        }
+
+        if (args->render.movie && !num_frames_set) {
+            print_missing_argument("--frames");
         }
     }
     else if (arg_matches(argv[1], "bsp_test", 0)) { // BSP_TEST

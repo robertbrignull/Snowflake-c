@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
         FILE *log = fopen(args->render.input, "r");
 
         render_log(log, args->render.output,
-            args->render.colorize, args->render.movie);
+            args->render.colorize, args->render.movie, args->render.num_frames);
     }
     else if (args->mode == BSP_TEST) {
         run_bsp_tests();

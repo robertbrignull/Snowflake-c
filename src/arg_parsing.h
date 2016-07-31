@@ -12,6 +12,7 @@ typedef struct arg_options_render {
     char *input;
     int colorize;
     int movie;
+    int num_frames;
 } arg_options_render;
 
 typedef struct arg_options {
