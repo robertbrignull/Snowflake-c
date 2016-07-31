@@ -11,13 +11,32 @@
 int find_number_of_particles(FILE *log) {
     fseek(log, 0, SEEK_SET);
 
-    int lines = 1;
+    int lines = 0;
     int ch = 0;
     while ((ch = fgetc(log)) != EOF)
     {
         if (ch == '\n') lines++;
     }
     return lines;
+}
+
+double *read_log_file(FILE *log, int num_particles) {
+    double *points = (double*) malloc(num_particles * 2 * sizeof(double));
+    CHECK_MEM(points);
+
+    fseek(log, 0, SEEK_SET);
+
+    double x, y;
+    for (int i = 0; i < num_particles; i++) {
+        if (fscanf(log, "%*d %lf %lf %*d", &x, &y) != 2) {
+            fprintf(stderr, "Could not read line from log file\n");
+        }
+
+        points[2*i] = x;
+        points[2*i+1] = y;
+    }
+
+    return points;
 }
 
 typedef struct image_def {
@@ -29,18 +48,15 @@ typedef struct image_def {
     int top;      // the top offset of the image in the coordinate space
 } image_def;
 
-image_def create_array(FILE *log, int colorize) {
+image_def create_image_array(double *points, int num_particles, int colorize) {
     int BN = 0;
     int BS = 0;
     int BW = 0;
     int BE = 0;
 
-    fseek(log, 0, SEEK_SET);
-
-    double d_x, d_y;
-    while (fscanf(log, "%*d %lf %lf %*d", &d_x, &d_y) == 2) {
-        int x = (int) floor(d_x);
-        int y = (int) floor(d_y);
+    for (int i = 0; i < num_particles; i++) {
+        int x = (int) floor(points[2*i]);
+        int y = (int) floor(points[2*i+1]);
 
         BN = min_i(BN, y);
         BS = max_i(BS, y);
@@ -87,23 +103,17 @@ void hsv2rgb(double hue, char *r, char *g, char *b) {
     }
 }
 
-void generate_image(FILE *log, image_def image, int colorize, int limit) {
+void generate_image(double *points, image_def image, int colorize, int limit) {
     memset(image.P, 0, image.P_size);
 
-    fseek(log, 0, SEEK_SET);
-
-    int n = 1;
-    double d_x, d_y;
-    while (fscanf(log, "%*d %lf %lf %*d", &d_x, &d_y) == 2 && n < limit) {
-        n += 1;
-
-        int x = ((int) floor(d_x)) - image.left;
-        int y = ((int) floor(d_y)) - image.top;
+    for (int i = 0; i < limit; i++) {
+        int x = ((int) floor(points[2*i])) - image.left;
+        int y = ((int) floor(points[2*i+1])) - image.top;
 
         if (x >= 0 && x < image.width && y >= 0 && y < image.height) {
             int index = pix(x, y, image.width, image.height, colorize);
             if (colorize) {
-                double age = ((double) n * 360) / limit;
+                double age = ((double) i * 360) / limit;
                 hsv2rgb(age, &image.P[index+0], &image.P[index+1], &image.P[index+2]);
             }
             else {
@@ -113,27 +123,25 @@ void generate_image(FILE *log, image_def image, int colorize, int limit) {
     }
 }
 
-void render_up_to_limit(FILE *log, char *filename, image_def image, int colorize, int limit) {
-    generate_image(log, image, colorize, limit);
-    write_tga(filename, image.P, image.width, image.height, colorize);
-}
-
 void render_log(FILE *log, char *filename, int colorize, int movie, int num_frames) {
     int num_particles = find_number_of_particles(log);
-
-    image_def image = create_array(log, colorize);
+    double *points = read_log_file(log, num_particles);
+    image_def image = create_image_array(points, num_particles, colorize);
 
     if (movie) {
         char *frame_filename = (char*) malloc(strlen(filename) + 100);
         for (int frame = 0; frame < num_frames; frame++) {
             int limit = 1.0 * num_particles * frame / num_frames;
             sprintf(frame_filename, filename, limit);
-            render_up_to_limit(log, frame_filename, image, colorize, limit);
+            generate_image(points, image, colorize, limit);
+            write_tga(frame_filename, image.P, image.width, image.height, colorize);
         }
     }
     else {
-        render_up_to_limit(log, filename, image, colorize, num_particles);
+        generate_image(points, image, colorize, num_particles);
+        write_tga(filename, image.P, image.width, image.height, colorize);
     }
    
+    free(points);
     free(image.P);
 }
