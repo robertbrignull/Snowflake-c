@@ -1,27 +1,41 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "tga.h"
 
-int pix(int x, int y, int width, int height) {
-    return x * height + y;
+int bytes_per_pixel(int color) {
+    return color ? 3 : 1;
 }
 
-void write_run(FILE *out, int v, int l) {
+int pix(int x, int y, int width, int height, int color) {
+    return (x * height + y) * bytes_per_pixel(color);
+}
+
+int pixels_match(char *pixels, int pix1, int pix2, int color) {
+    return memcmp(&pixels[pix1], &pixels[pix2], bytes_per_pixel(color)) == 0;
+}
+
+void write_run(FILE *out, char *pixels, int index, int l, int color) {
     unsigned char header = 127 + l;
-    unsigned char data = v;
-
     fwrite(&header, 1, 1, out);
-    fwrite(&data, 1, 1, out);
+
+    for (int i = 0; i < bytes_per_pixel(color); i++) {
+        unsigned char data = pixels[index + i];
+        fwrite(&data, 1, 1, out);
+    }
 }
 
+// Expects pixels to be of length width * height if greyscale or
+// or length width * height * 3 if color.
 void write_tga(char *filename, char *pixels,
-               unsigned short width, unsigned short height) {
+               unsigned short width, unsigned short height,
+               int color) {
     FILE *out = fopen(filename, "w");
 
     unsigned char id_length = 0;
     unsigned char color_map_type = 0;
-    unsigned char image_type = 11;
+    unsigned char image_type = color ? 10 : 11;
 
     unsigned short color_map_index = 0;
     unsigned short color_map_length = 0;
@@ -29,7 +43,7 @@ void write_tga(char *filename, char *pixels,
 
     unsigned short x_origin = 0;
     unsigned short y_origin = 0;
-    unsigned char depth = 8;
+    unsigned char depth = bytes_per_pixel(color) * 8;
     unsigned char descriptor = 0;
 
 
@@ -53,26 +67,26 @@ void write_tga(char *filename, char *pixels,
 
     // Store the image run-length encoded
 
-    // the length and value of the current run
+    // the length and index of the current run
     int l = 0;
-    int v = pixels[pix(0, 0, width, height)];
+    int c = pix(0, 0, width, height, color);
 
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
-            int i = pix(x, y, width, height);
+            int i = pix(x, y, width, height, color);
 
-            if (pixels[i] != v || l == 127) {
-                write_run(out, v, l);
+            if (!pixels_match(pixels, c, i, color) || l == 127) {
+                write_run(out, pixels, c, l, color);
                 
                 l = 1;
-                v = pixels[i];
+                c = i;
             }
             else {
                 l++;
             }
         }
     }
-    write_run(out, v, l);
+    write_run(out, pixels, c, l, color);
 
     fclose(out);
 }

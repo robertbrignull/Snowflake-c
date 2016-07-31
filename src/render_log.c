@@ -55,7 +55,7 @@ char *generate_image(FILE *log, int *w, int *h) {
         int y = ((int) floor(d_y)) - top;
 
         if (x >= 0 && x < width && y >= 0 && y < height) {
-            P[pix(x, y, width, height)] = 255;
+            P[pix(x, y, width, height, 0)] = 255;
         }
     }
 
@@ -70,7 +70,7 @@ void render_log(FILE *log, char *filename) {
     int width, height;
     char *P = generate_image(log, &width, &height);
 
-    write_tga(filename, P, width, height);
+    write_tga(filename, P, width, height, 0);
 
     free(P);
 }
