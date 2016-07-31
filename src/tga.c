@@ -33,6 +33,11 @@ void write_tga(char *filename, char *pixels,
                int color) {
     FILE *out = fopen(filename, "w");
 
+    if (out == 0) {
+        fprintf(stderr, "Could not open \"%s\" for writing\n", filename);
+        exit(1);
+    }
+
     unsigned char id_length = 0;
     unsigned char color_map_type = 0;
     unsigned char image_type = color ? 10 : 11;
