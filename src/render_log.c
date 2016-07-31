@@ -20,11 +20,20 @@ int find_number_of_particles(FILE *log) {
     return lines;
 }
 
-void find_bounds(FILE *log, int *BN, int *BS, int *BW, int *BE) {
-    int bn = 0;
-    int bs = 0;
-    int bw = 0;
-    int be = 0;
+typedef struct image_def {
+    char *P;      // the pixels array
+    int P_size;   // the length of the pixels array
+    int width;    // the width of the image
+    int height;   // the height of the image
+    int left;     // the left offset of the image in the coordinate space
+    int top;      // the top offset of the image in the coordinate space
+} image_def;
+
+image_def create_array(FILE *log, int colorize) {
+    int BN = 0;
+    int BS = 0;
+    int BW = 0;
+    int BE = 0;
 
     fseek(log, 0, SEEK_SET);
 
@@ -33,16 +42,23 @@ void find_bounds(FILE *log, int *BN, int *BS, int *BW, int *BE) {
         int x = (int) floor(d_x);
         int y = (int) floor(d_y);
 
-        bn = min_i(bn, y);
-        bs = max_i(bs, y);
-        bw = min_i(bw, x);
-        be = max_i(be, x);
+        BN = min_i(BN, y);
+        BS = max_i(BS, y);
+        BW = min_i(BW, x);
+        BE = max_i(BE, x);
     }
 
-    *BN = bn;
-    *BS = bs;
-    *BW = bw;
-    *BE = be;
+    image_def image;
+    image.width = BE - BW + 1;
+    image.height = BS - BN + 1;
+    image.left = BW;
+    image.top = BN;
+
+    image.P_size = image.width * image.height * bytes_per_pixel(colorize);
+    image.P = (char*) malloc(image.P_size);
+    CHECK_MEM(image.P);
+
+    return image;
 }
 
 void hsv2rgb(double hue, char *r, char *g, char *b) {
@@ -67,59 +83,43 @@ void hsv2rgb(double hue, char *r, char *g, char *b) {
     }
 }
 
-char *generate_image(FILE *log, int *w, int *h, int colorize) {
-    int BN, BS, BW, BE;
-    find_bounds(log, &BN, &BS, &BW, &BE);
-
-    int width = BE - BW + 1;
-    int height = BS - BN + 1;
-    int left = BW;
-    int top = BN;
-
-    int P_size = width * height * bytes_per_pixel(colorize);
-    char *P = (char*) malloc(P_size);
-    CHECK_MEM(P);
-    memset(P, 0, P_size);
-
-    int num_particles = 0;
-    if (colorize) {
-        num_particles = find_number_of_particles(log);
-    }
+void generate_image(FILE *log, image_def image, int colorize, int limit) {
+    memset(image.P, 0, image.P_size);
 
     fseek(log, 0, SEEK_SET);
 
-    int n = 0;
+    int n = 1;
     double d_x, d_y;
-    while (fscanf(log, "%*d %lf %lf %*d", &d_x, &d_y) == 2) {
+    while (fscanf(log, "%*d %lf %lf %*d", &d_x, &d_y) == 2 && n < limit) {
         n += 1;
 
-        int x = ((int) floor(d_x)) - left;
-        int y = ((int) floor(d_y)) - top;
+        int x = ((int) floor(d_x)) - image.left;
+        int y = ((int) floor(d_y)) - image.top;
 
-        if (x >= 0 && x < width && y >= 0 && y < height) {
-            int index = pix(x, y, width, height, colorize);
+        if (x >= 0 && x < image.width && y >= 0 && y < image.height) {
+            int index = pix(x, y, image.width, image.height, colorize);
             if (colorize) {
-                double age = ((double) n * 360) / num_particles;
-                hsv2rgb(age, &P[index+0], &P[index+1], &P[index+2]);
+                double age = ((double) n * 360) / limit;
+                hsv2rgb(age, &image.P[index+0], &image.P[index+1], &image.P[index+2]);
             }
             else {
-                P[index] = 255;
+                image.P[index] = 255;
             }
         }
     }
+}
 
-    *w = width;
-    *h = height;
-
-    return P;
+void render_up_to_limit(FILE *log, char *filename, image_def image, int colorize, int limit) {
+    generate_image(log, image, colorize, limit);
+    write_tga(filename, image.P, image.width, image.height, colorize);
 }
 
 void render_log(FILE *log, char *filename, int colorize) {
-    // Write the flake to a 2D array of pixels
-    int width, height;
-    char *P = generate_image(log, &width, &height, colorize);
+    int num_particles = find_number_of_particles(log);
 
-    write_tga(filename, P, width, height, colorize);
+    image_def image = create_array(log, colorize);
 
-    free(P);
+    render_up_to_limit(log, filename, image, colorize, num_particles);
+   
+    free(image.P);
 }
