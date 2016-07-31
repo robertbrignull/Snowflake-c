@@ -62,7 +62,7 @@ image_def create_array(FILE *log, int colorize) {
 }
 
 void hsv2rgb(double hue, char *r, char *g, char *b) {
-    char x = 255 * (((int) floor(hue / 60)) % 2);
+    char x = 255 * fmod(hue, 60.0) / 60;
     if (hue < 60) {
         *r = 255; *g = x; *b = 0;
     }
