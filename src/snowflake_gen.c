@@ -33,7 +33,7 @@ void create_snowflake(int N, FILE *log) {
         int done = 0;
         int num_iterations = 0;
         while (!done) {
-            ++num_iterations;
+            num_iterations += 1;
 
             // Find the closest particle in the flake
             bsp_result d = bsp_find_nearest(b, x, y);
@@ -50,8 +50,13 @@ void create_snowflake(int N, FILE *log) {
                 x += d.d * cos(r);
                 y += d.d * sin(r);
 
+                // Check if we've collided without another iteration
+                if (dist_d(x, y, d.x, d.y) <= 2.0) {
+                    num_iterations += 1;
+                    done = 1;
+                }
                 // Check if we've left the area
-                if (dist_origin_d(x, y) > destruction_boundary) {
+                else if (dist_origin_d(x, y) > destruction_boundary) {
                     // Use conformals maps to map (x, y) back onto the creation boundary
                     r = (double) rand();
                     double x1 = cos(r);
