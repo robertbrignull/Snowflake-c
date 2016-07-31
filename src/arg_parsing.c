@@ -27,7 +27,11 @@ void print_usage() {
     printf("    -o --output           Output filename for image\n");
     printf("                          Default is out/output.tga\n");
     printf("    -c --colorize         Show pixel age through color\n");
-    printf("                          Default is no color\n\n");
+    printf("                          Default is no color\n");
+    printf("    -m --movie            Output all states as images instead of just the final flake\n");
+    printf("                          Default is just to final frame\n");
+    printf("                          If this is used then the output filename should be\n");
+    printf("                            provided as a format string, e.g. out/output_%%d.tga\n\n");
 
     printf("Mode bsp_test\n");
     printf("  runs tests on the BSP implementation.\n\n");
@@ -124,6 +128,8 @@ arg_options *parse_args(int argc, char **argv) {
 
         args->render.colorize = 0;
 
+        args->render.movie = 0;
+
         int argi = 2;
         while (argi < argc) {
             if (arg_matches(argv[argi], "--output", "-o")) {
@@ -145,6 +151,10 @@ arg_options *parse_args(int argc, char **argv) {
             }
             else if (arg_matches(argv[argi], "--colorize", "-c")) {
                 args->render.colorize = 1;
+                argi += 1;
+            }
+            else if (arg_matches(argv[argi], "--movie", "-m")) {
+                args->render.movie = 1;
                 argi += 1;
             }
             else {

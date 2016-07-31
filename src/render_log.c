@@ -114,12 +114,21 @@ void render_up_to_limit(FILE *log, char *filename, image_def image, int colorize
     write_tga(filename, image.P, image.width, image.height, colorize);
 }
 
-void render_log(FILE *log, char *filename, int colorize) {
+void render_log(FILE *log, char *filename, int colorize, int movie) {
     int num_particles = find_number_of_particles(log);
 
     image_def image = create_array(log, colorize);
 
-    render_up_to_limit(log, filename, image, colorize, num_particles);
+    if (movie) {
+        char *frame_filename = (char*) malloc(strlen(filename) + 100);
+        for (int limit = 1; limit <= num_particles; limit++) {
+            sprintf(frame_filename, filename, limit);
+            render_up_to_limit(log, frame_filename, image, colorize, limit);
+        }
+    }
+    else {
+        render_up_to_limit(log, filename, image, colorize, num_particles);
+    }
    
     free(image.P);
 }
