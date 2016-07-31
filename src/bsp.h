@@ -54,8 +54,9 @@ bsp_t *bsp_new(double S);
 // Destroys the tree, freeing memory
 void bsp_destroy(bsp_t *b);
 
-// Increases the size of the bsp, returning a new one
-bsp_t *bsp_increase_size(bsp_t *b);
+// A convenience method to create a new bsp of the given
+// size, copy across all points, and destroy the old bsp.
+bsp_t *bsp_change_size(bsp_t *b, int new_size);
 
 // Adds a point to the tree
 void bsp_add_point(bsp_t *b, double x, double y);

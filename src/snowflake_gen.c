@@ -8,9 +8,7 @@
 #include "snowflake_gen.h"
 
 void create_snowflake(int N, FILE *log) {
-    double max_size = 50.0;
-
-    bsp_t *b = bsp_new(max_size);
+    bsp_t *b = bsp_new(50.0);
 
     bsp_add_point(b, 0.0, 0.0);
 
@@ -91,12 +89,8 @@ void create_snowflake(int N, FILE *log) {
         } // particle has collided
 
         // possibly increase the BSP size
-        if (x <= -max_size || x >= max_size || y <= -max_size || y >= max_size) {
-            bsp_t *newB = bsp_increase_size(b);
-            bsp_destroy(b);
-            
-            b = newB;
-            max_size = b->size;
+        if (x <= -b->size || x >= b->size || y <= -b->size || y >= b->size) {
+            b = bsp_change_size(b, b->size * 2);
         }
 
         // add the new point
