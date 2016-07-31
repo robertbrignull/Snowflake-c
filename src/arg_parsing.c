@@ -16,16 +16,18 @@ void print_usage() {
     printf("  Required argumens:\n");
     printf("    -n --num_particles    The number of particles to simulate\n\n");
     printf("  Optional argumens:\n");
-    printf("    -o --output   Output the snowflake as text file\n");
-    printf("                  Default is out/output.flake\n\n");
+    printf("    -o --output           Output the snowflake as text file\n");
+    printf("                          Default is out/output.flake\n\n");
 
     printf("Mode render\n");
     printf("  render a snowflake from a previous run.\n\n");
     printf("  Required argumens:\n");
-    printf("    -i --input    Input of a previous snowflake run as a text file\n\n");
+    printf("    -i --input            Input of a previous snowflake run as a text file\n\n");
     printf("  Optional argumens:\n");
-    printf("    -o --output   Output filename for image\n");
-    printf("                  Default is out/output.tga\n\n");
+    printf("    -o --output           Output filename for image\n");
+    printf("                          Default is out/output.tga\n");
+    printf("    -c --colorize         Show pixel age through color\n");
+    printf("                          Default is no color\n\n");
 
     printf("Mode bsp_test\n");
     printf("  runs tests on the BSP implementation.\n\n");
@@ -120,6 +122,8 @@ arg_options *parse_args(int argc, char **argv) {
         CHECK_MEM(args->render.output);
         strcpy(args->render.output, default_output);
 
+        args->render.colorize = 0;
+
         int argi = 2;
         while (argi < argc) {
             if (arg_matches(argv[argi], "--output", "-o")) {
@@ -138,6 +142,10 @@ arg_options *parse_args(int argc, char **argv) {
                 strcpy(args->render.input, argv[argi+1]);
                 input_set = 1;
                 argi += 2;
+            }
+            else if (arg_matches(argv[argi], "--colorize", "-c")) {
+                args->render.colorize = 1;
+                argi += 1;
             }
             else {
                 print_unrecognised_argument(argv[argi]);

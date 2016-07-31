@@ -10,6 +10,7 @@ typedef struct arg_options_gen {
 typedef struct arg_options_render {
     char *output;
     char *input;
+    int colorize;
 } arg_options_render;
 
 typedef struct arg_options {

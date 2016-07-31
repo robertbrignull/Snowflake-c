@@ -2,4 +2,4 @@
 
 #include <stdio.h>
 
-void render_log(FILE *log, char *filename);
+void render_log(FILE *log, char *filename, int colorize);

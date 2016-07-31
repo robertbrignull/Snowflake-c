@@ -30,7 +30,7 @@ int main(int argc, char **argv) {
     else if (args->mode == RENDER) {
         FILE *log = fopen(args->render.input, "r");
 
-        render_log(log, args->render.output);
+        render_log(log, args->render.output, args->render.colorize);
     }
     else if (args->mode == BSP_TEST) {
         run_bsp_tests();
