@@ -4,3 +4,9 @@
 
 # JetBrains directory
 /.idea/
+
+# CMake files
+/Makefile
+/CMakeFiles
+/cmake_install.cmake
+/CMakeCache.txt
