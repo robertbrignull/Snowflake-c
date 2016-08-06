@@ -1,3 +1,6 @@
 /snowflake
 /src/*.o
 /out/
+
+# JetBrains directory
+/.idea/
