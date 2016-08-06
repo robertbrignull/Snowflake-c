@@ -9,4 +9,10 @@ We use a bsp to store the snowflake as that was deemed to be the fastest datastr
 
 The output format is TGA because that was the easiest to manually write.
 
+### Use
+
+Compile by doing `cd build; cmake ..; make`
+
+Then from the base directory run `build/snowflake` for more instructions on how to use the program.
+
 To combine multiple images into a movie, use `ffmpeg -framerate 60 -pattern_type glob -i '*.tga' -c:v libx264rgb -pix_fmt bgr24 out.mp4`
