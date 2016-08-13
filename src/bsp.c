@@ -110,15 +110,15 @@ void bsp_add_point_impl(bsp_t *b, int node_index, double node_x, double node_y, 
         if (south && west) {
             node_index = node.SW;
         }
-        else if (south && !west) {
+        else if (south) {
             node_index = node.SE;
             node_x += node_size / 2;
         }
-        else if (!south && west) {
+        else if (west) {
             node_index = node.NW;
             node_y += node_size / 2;
         }
-        else if (!south && !west) {
+        else {
             node_index = node.NE;
             node_x += node_size / 2;
             node_y += node_size / 2;
