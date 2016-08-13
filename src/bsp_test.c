@@ -114,7 +114,7 @@ void test_performance() {
     for (x = 0; x < N; x++) {
         for (y = 0; y < N; y++) {
             d = bsp_find_nearest(b, x+0.5, y+0.5);
-            assert(d.d > 0.707 && 0.708);
+            assert(d.d > 0.707 && d.d < 0.708);
         }
     }
     gettimeofday(&e, 0);
