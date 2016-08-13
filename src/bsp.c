@@ -41,7 +41,7 @@ void bsp_destroy(bsp_t *b) {
 
 // A convenience method to create a new bsp of the given
 // size, copy across all points, and destroy the old bsp.
-bsp_t *bsp_change_size(bsp_t *b, int new_size) {
+bsp_t *bsp_change_size(bsp_t *b, double new_size) {
     bsp_t *new_b = bsp_new(new_size);
 
     for (int i = 0; i < b->num_nodes; i++) {
