@@ -93,7 +93,7 @@ void test_performance() {
     int N = 1000;
     int x, y;
     struct timeval s, e;
-    int t;
+    __time_t t;
     bsp_result d;
 
     printf("N = %d, ", N);
@@ -136,7 +136,7 @@ void test_random() {
     double x, y;
 
     struct timeval s, e;
-    int t;
+    __time_t t;
 
     srand(42);
 
