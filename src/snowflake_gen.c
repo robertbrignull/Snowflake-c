@@ -25,9 +25,9 @@ void create_snowflake(int N, FILE *log) {
         if (n % 10000 == 0) printf("%d\n", n);
 
         // spawn somewhere on the bounding circle
-        double r = (double) rand();
-        double x = creation_boundary * cos(r);
-        double y = creation_boundary * sin(r);
+        double spawn_dir = (double) rand();
+        double x = creation_boundary * cos(spawn_dir);
+        double y = creation_boundary * sin(spawn_dir);
 
         // set done to 1 once this particle collides
         int done = 0;
@@ -46,9 +46,9 @@ void create_snowflake(int N, FILE *log) {
             }
             else {
                 // Randomly walk in some direction
-                double r = (double) rand();
-                x += d.d * cos(r);
-                y += d.d * sin(r);
+                double walk_dir = (double) rand();
+                x += d.d * cos(walk_dir);
+                y += d.d * sin(walk_dir);
 
                 // Check if we've collided without another iteration
                 if (dist(x, y, d.x, d.y) <= 2.0) {
@@ -58,9 +58,9 @@ void create_snowflake(int N, FILE *log) {
                 // Check if we've left the area
                 else if (dist_origin(x, y) > destruction_boundary) {
                     // Use conformals maps to map (x, y) back onto the creation boundary
-                    r = (double) rand();
-                    double x1 = cos(r);
-                    double y1 = sin(r);
+                    double map_dir = (double) rand();
+                    double x1 = cos(map_dir);
+                    double y1 = sin(map_dir);
 
                     // Use g(z) = r * (p + r * z) / (r + p * z)
 
