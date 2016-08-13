@@ -82,20 +82,22 @@ image_def create_image_array(double *points, int num_particles, int colorize) {
 }
 
 void hsv2rgb(double hue, char *r, char *g, char *b) {
-    char x = 255 * fmod(hue, 60.0) / 60;
-    if (hue < 60) {
+    double hue_range = fmod(hue / 60.0, 6);
+    char x = 255 * (1.0 - fabs(fmod(hue_range, 2.0) - 1.0));
+
+    if (hue_range < 1) {
         *r = 255; *g = x; *b = 0;
     }
-    else if (hue < 120) {
+    else if (hue_range < 2) {
         *r = x; *g = 255; *b = 0;
     }
-    else if (hue < 180) {
+    else if (hue_range < 3) {
         *r = 0; *g = 255; *b = x;
     }
-    else if (hue < 240) {
+    else if (hue_range < 4) {
         *r = 0; *g = x; *b = 255;
     }
-    else if (hue < 300) {
+    else if (hue_range < 5) {
         *r = x; *g = 0; *b = 255;
     }
     else {
