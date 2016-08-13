@@ -1,9 +1,29 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "algo.h"
+#include "bsp.h"
 
 #include "flake_log.h"
+
+bsp_t *read_flake_log_as_bsp(FILE *flake, double *farthest_particle) {
+    fseek(flake, 0, SEEK_SET);
+
+    bsp_t *b = bsp_new(50);
+    *farthest_particle = 0.0;
+
+    double x, y;
+    while (fscanf(flake, "%lf %lf %*d", &x, &y) == 2) {
+        if (fabs(x) >= b->size || fabs(y) >= b->size) {
+            b = bsp_change_size(b, b->size * 2);
+        }
+        bsp_add_point(b, x, y);
+        *farthest_particle = fmax(*farthest_particle, dist_origin(x, y));
+    }
+
+    return b;
+}
 
 int find_number_of_particles(FILE *flake) {
     fseek(flake, 0, SEEK_SET);

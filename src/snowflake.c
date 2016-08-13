@@ -21,7 +21,7 @@ int main(int argc, char **argv) {
     if (args->mode == SNOWFLAKE_GEN) {
         FILE *log = 0;
         if (args->gen.output != 0) {
-            log = fopen(args->gen.output, "w");
+            log = fopen(args->gen.output, "a+");
         }
 
         create_snowflake(args->gen.num_particles, log);
