@@ -7,7 +7,7 @@
 #include "bsp.h"
 
 // Declare private functions
-int bsp_new_node(bsp_t *b, bsp_type_e type, int parent);
+int bsp_new_node(bsp_t *b, bsp_type_e type);
 void bsp_add_point_impl(bsp_t *b, int node_index, double node_x, double node_y, double node_size);
 bsp_result bsp_find_nearest_impl(bsp_t *b, int node_index, double node_x, double node_y, double node_size);
 void bsp_print_impl(bsp_t *b, int node_index, double node_x, double node_y, double node_size);
@@ -28,7 +28,6 @@ bsp_t *bsp_new(double S) {
     CHECK_MEM(b->nodes);
 
     b->nodes[0].type = BSP_EMPTY;
-    b->nodes[0].parent = -1;
     b->num_nodes = 1;
 
     return b;
@@ -84,7 +83,7 @@ void bsp_print(bsp_t *b) {
 
 
 // Private method, creates a new bsp tree node
-int bsp_new_node(bsp_t *b, bsp_type_e type, int parent) {
+int bsp_new_node(bsp_t *b, bsp_type_e type) {
     if (b->num_nodes == b->nodes_size) {
         b->nodes_size *= 2;
         b->nodes = (bsp_node*) realloc(b->nodes, sizeof(bsp_node) * b->nodes_size);
@@ -93,7 +92,6 @@ int bsp_new_node(bsp_t *b, bsp_type_e type, int parent) {
 
     int i = b->num_nodes;
     b->nodes[i].type = type;
-    b->nodes[i].parent = parent;
     b->num_nodes++;
 
     return i;
@@ -133,10 +131,10 @@ void bsp_add_point_impl(bsp_t *b, int node_index, double node_x, double node_y, 
             double old_point_x = node.x;
             double old_point_y = node.y;
 
-            int SW = bsp_new_node(b, BSP_EMPTY, node_index);
-            int SE = bsp_new_node(b, BSP_EMPTY, node_index);
-            int NW = bsp_new_node(b, BSP_EMPTY, node_index);
-            int NE = bsp_new_node(b, BSP_EMPTY, node_index);
+            int SW = bsp_new_node(b, BSP_EMPTY);
+            int SE = bsp_new_node(b, BSP_EMPTY);
+            int NW = bsp_new_node(b, BSP_EMPTY);
+            int NE = bsp_new_node(b, BSP_EMPTY);
 
             node.type = BSP_CROSS;
             node.SW = SW;

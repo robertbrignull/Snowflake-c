@@ -6,9 +6,6 @@ typedef struct bsp_node {
     // The type of this node, determines how to use the union below
     bsp_type_e type;
 
-    // The parent of this node
-    int parent;
-
     union {
         // If this node is a point then this contains
         // the coordinates of that point
