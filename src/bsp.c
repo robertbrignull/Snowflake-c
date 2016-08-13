@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "algo.h"
 
@@ -169,8 +170,8 @@ bsp_result bsp_find_nearest_impl(bsp_t *b, int node_index, double node_x, double
     if (node.type == BSP_CROSS) {
         double dx = point_x - node_x - node_size / 2;
         double dy = point_y - node_y - node_size / 2;
-        double adx = abs_d(dx);
-        double ady = abs_d(dy);
+        double adx = fabs(dx);
+        double ady = fabs(dy);
         int N_x_modifier = (dx >= 0) ? 1 : 0;
         int N_y_modifier = (dy >= 0) ? 1 : 0;
 

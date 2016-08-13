@@ -10,12 +10,6 @@ int min_i(int x, int y);
 
 int max_i(int x, int y);
 
-double max_d(double x, double y);
-
-double min_d(double x, double y);
-
-double abs_d(double x);
-
 double dist_d(double x, double y, double u, double v);
 
 double dist_origin_d(double x, double y);

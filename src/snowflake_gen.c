@@ -108,8 +108,8 @@ void create_snowflake(int N, FILE *log) {
 
         // update the creation and destruction boundaries
         double dis = dist_origin_d(x, y);
-        creation_boundary = max_d(creation_boundary, dis + creation_standoff);
-        destruction_boundary = max_d(destruction_boundary, dis + destruction_standoff);
+        creation_boundary = fmax(creation_boundary, dis + creation_standoff);
+        destruction_boundary = fmax(destruction_boundary, dis + destruction_standoff);
     }
 
     bsp_destroy(b);
