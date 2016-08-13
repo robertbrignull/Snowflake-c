@@ -51,12 +51,12 @@ void create_snowflake(int N, FILE *log) {
                 y += d.d * sin(r);
 
                 // Check if we've collided without another iteration
-                if (dist_d(x, y, d.x, d.y) <= 2.0) {
+                if (dist(x, y, d.x, d.y) <= 2.0) {
                     num_iterations += 1;
                     done = 1;
                 }
                 // Check if we've left the area
-                else if (dist_origin_d(x, y) > destruction_boundary) {
+                else if (dist_origin(x, y) > destruction_boundary) {
                     // Use conformals maps to map (x, y) back onto the creation boundary
                     r = (double) rand();
                     double x1 = cos(r);
@@ -107,7 +107,7 @@ void create_snowflake(int N, FILE *log) {
         }
 
         // update the creation and destruction boundaries
-        double dis = dist_origin_d(x, y);
+        double dis = dist_origin(x, y);
         creation_boundary = fmax(creation_boundary, dis + creation_standoff);
         destruction_boundary = fmax(destruction_boundary, dis + destruction_standoff);
     }

@@ -58,10 +58,10 @@ image_def create_image_array(double *points, int num_particles, int colorize) {
         int x = (int) floor(points[2*i]);
         int y = (int) floor(points[2*i+1]);
 
-        BN = min_i(BN, y);
-        BS = max_i(BS, y);
-        BW = min_i(BW, x);
-        BE = max_i(BE, x);
+        BN = min(BN, y);
+        BS = max(BS, y);
+        BW = min(BW, x);
+        BE = max(BE, x);
     }
 
     image_def image;

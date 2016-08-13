@@ -221,7 +221,7 @@ bsp_result bsp_find_nearest_impl(bsp_t *b, int node_index, double node_x, double
 
             r = min_bsp_result(r, bsp_find_nearest_impl(b, V, node_x + node_size / 2 * N_x_modifier, node_y + node_size / 2 * (1 - N_y_modifier), node_size / 2));
 
-            if (r.d != -1.0 && r.d <= dist_origin_d(dx, dy)) {
+            if (r.d != -1.0 && r.d <= dist_origin(dx, dy)) {
                 return r;
             }
 
@@ -236,7 +236,7 @@ bsp_result bsp_find_nearest_impl(bsp_t *b, int node_index, double node_x, double
 
             r = min_bsp_result(r, bsp_find_nearest_impl(b, H, node_x + node_size / 2 * (1 - N_x_modifier), node_y + node_size / 2 * N_y_modifier, node_size / 2));
 
-            if (r.d != -1.0 && r.d <= dist_origin_d(dx, dy)) {
+            if (r.d != -1.0 && r.d <= dist_origin(dx, dy)) {
                 return r;
             }
 
@@ -247,7 +247,7 @@ bsp_result bsp_find_nearest_impl(bsp_t *b, int node_index, double node_x, double
         bsp_result r;
         r.x = node.x;
         r.y = node.y;
-        r.d = dist_d(point_x, point_y, node.x, node.y);
+        r.d = dist(point_x, point_y, node.x, node.y);
         return r;
     }
     else {
