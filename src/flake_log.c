@@ -7,10 +7,12 @@
 
 #include "flake_log.h"
 
-bsp_t *read_flake_log_as_bsp(FILE *flake, double *farthest_particle) {
+bsp_t *read_flake_log_as_bsp(FILE *flake, int *num_particles, double *farthest_particle) {
     fseek(flake, 0, SEEK_SET);
 
     bsp_t *b = bsp_new(50);
+
+    *num_particles = 0;
     *farthest_particle = 0.0;
 
     double x, y;
@@ -19,6 +21,7 @@ bsp_t *read_flake_log_as_bsp(FILE *flake, double *farthest_particle) {
             b = bsp_change_size(b, b->size * 2);
         }
         bsp_add_point(b, x, y);
+        *num_particles += 1;
         *farthest_particle = fmax(*farthest_particle, dist_origin(x, y));
     }
 

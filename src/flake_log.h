@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include "bsp.h"
 
-bsp_t *read_flake_log_as_bsp(FILE *flake, double *farthest_particle);
+bsp_t *read_flake_log_as_bsp(FILE *flake, int *num_particles, double *farthest_particle);
 
 double *read_flake_log_as_array(FILE *flake, int *num_particles);
 

@@ -9,15 +9,17 @@
 #include "snowflake_gen.h"
 
 void create_snowflake(int N, FILE *log) {
+    int num_particles = 0;
     double farthest_particle = 0.0;
-    bsp_t *b = read_flake_log_as_bsp(log, &farthest_particle);
+    bsp_t *b = read_flake_log_as_bsp(log, &num_particles, &farthest_particle);
 
     double creation_standoff = 10.0;
     double destruction_standoff = 50.0;
     double creation_boundary = creation_standoff;
     double destruction_boundary = destruction_standoff;
 
-    if (farthest_particle == 0.0) {
+    if (num_particles == 0) {
+        num_particles = 1;
         bsp_add_point(b, 0.0, 0.0);
         log_new_particle(log, 0.0, 0.0, 0);
     }
@@ -26,7 +28,7 @@ void create_snowflake(int N, FILE *log) {
         destruction_boundary += farthest_particle;
     }
 
-    for (int n = 0; n < N; n++) {
+    for (int n = num_particles + 1; n <= num_particles + N; n++) {
         if (n % 10000 == 0) printf("%d\n", n);
 
         // spawn somewhere on the bounding circle
