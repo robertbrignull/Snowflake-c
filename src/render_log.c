@@ -41,7 +41,7 @@ double *read_log_file(FILE *log, int num_particles) {
 
 typedef struct image_def {
     char *P;      // the pixels array
-    int P_size;   // the length of the pixels array
+    size_t P_size;   // the length of the pixels array
     int width;    // the width of the image
     int height;   // the height of the image
     int left;     // the left offset of the image in the coordinate space
@@ -74,7 +74,7 @@ image_def create_image_array(double *points, int num_particles, int colorize) {
     if (image.width % 2 == 1) image.width += 1;
     if (image.height % 2 == 1) image.height += 1;
 
-    image.P_size = image.width * image.height * bytes_per_pixel(colorize);
+    image.P_size = (size_t) image.width * image.height * bytes_per_pixel(colorize);
     image.P = (char*) malloc(image.P_size);
     CHECK_MEM(image.P);
 
