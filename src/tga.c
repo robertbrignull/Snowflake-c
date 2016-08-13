@@ -28,9 +28,7 @@ void write_run(FILE *out, char *pixels, int index, int l, int color) {
 
 // Expects pixels to be of length width * height if greyscale or
 // or length width * height * 3 if color.
-void write_tga(char *filename, char *pixels,
-               unsigned short width, unsigned short height,
-               int color) {
+void write_tga(char *filename, char *pixels, int width, int height, int color) {
     FILE *out = fopen(filename, "w");
 
     if (out == 0) {
@@ -48,6 +46,8 @@ void write_tga(char *filename, char *pixels,
 
     unsigned short x_origin = 0;
     unsigned short y_origin = 0;
+    unsigned short short_width = (unsigned short) width;
+    unsigned short short_height = (unsigned short) height;
     unsigned char depth = bytes_per_pixel(color) * 8;
     unsigned char descriptor = 0;
 
@@ -63,8 +63,8 @@ void write_tga(char *filename, char *pixels,
 
     fwrite(&x_origin, 2, 1, out);
     fwrite(&y_origin, 2, 1, out);
-    fwrite(&width, 2, 1, out);
-    fwrite(&height, 2, 1, out);
+    fwrite(&short_width, 2, 1, out);
+    fwrite(&short_height, 2, 1, out);
     fwrite(&depth, 1, 1, out);
     fwrite(&descriptor, 1, 1, out);
 
