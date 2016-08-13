@@ -13,11 +13,11 @@ int pix(int x, int y, int width, int height, int color) {
 }
 
 int pixels_match(char *pixels, int pix1, int pix2, int color) {
-    return memcmp(&pixels[pix1], &pixels[pix2], bytes_per_pixel(color)) == 0;
+    return memcmp(&pixels[pix1], &pixels[pix2], (size_t) bytes_per_pixel(color)) == 0;
 }
 
 void write_run(FILE *out, char *pixels, int index, int l, int color) {
-    unsigned char header = 127 + l;
+    unsigned char header = (unsigned char) (127 + l);
     fwrite(&header, 1, 1, out);
 
     for (int i = 0; i < bytes_per_pixel(color); i++) {
@@ -38,7 +38,7 @@ void write_tga(char *filename, char *pixels, int width, int height, int color) {
 
     unsigned char id_length = 0;
     unsigned char color_map_type = 0;
-    unsigned char image_type = color ? 10 : 11;
+    unsigned char image_type = (unsigned char) (color ? 10 : 11);
 
     unsigned short color_map_index = 0;
     unsigned short color_map_length = 0;
@@ -48,7 +48,7 @@ void write_tga(char *filename, char *pixels, int width, int height, int color) {
     unsigned short y_origin = 0;
     unsigned short short_width = (unsigned short) width;
     unsigned short short_height = (unsigned short) height;
-    unsigned char depth = bytes_per_pixel(color) * 8;
+    unsigned char depth = (unsigned char) (bytes_per_pixel(color) * 8);
     unsigned char descriptor = 0;
 
 
