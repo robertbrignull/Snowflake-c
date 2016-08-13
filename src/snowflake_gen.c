@@ -4,6 +4,7 @@
 
 #include "algo.h"
 #include "bsp.h"
+#include "flake_log.h"
 
 #include "snowflake_gen.h"
 
@@ -12,9 +13,7 @@ void create_snowflake(int N, FILE *log) {
 
     bsp_add_point(b, 0.0, 0.0);
 
-    if (log != 0) {
-        fprintf(log, "%d %f %f %d\n", 0, 0.0, 0.0, 0);
-    }
+    log_new_particle(log, 0.0, 0.0, 0);
 
     double creation_standoff = 10.0;
     double destruction_standoff = 50.0;
@@ -102,9 +101,7 @@ void create_snowflake(int N, FILE *log) {
         bsp_add_point(b, x, y);
 
         // log the addition of this point
-        if (log != 0) {
-            fprintf(log, "%f %f %d\n", x, y, num_iterations);
-        }
+        log_new_particle(log, x, y, num_iterations);
 
         // update the creation and destruction boundaries
         double dis = dist_origin(x, y);

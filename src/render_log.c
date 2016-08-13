@@ -7,37 +7,7 @@
 #include "tga.h"
 
 #include "render_log.h"
-
-int find_number_of_particles(FILE *log) {
-    fseek(log, 0, SEEK_SET);
-
-    int lines = 0;
-    int ch = 0;
-    while ((ch = fgetc(log)) != EOF)
-    {
-        if (ch == '\n') lines++;
-    }
-    return lines;
-}
-
-double *read_log_file(FILE *log, int num_particles) {
-    double *points = (double*) malloc(num_particles * 2 * sizeof(double));
-    CHECK_MEM(points);
-
-    fseek(log, 0, SEEK_SET);
-
-    double x, y;
-    for (int i = 0; i < num_particles; i++) {
-        if (fscanf(log, "%lf %lf %*d", &x, &y) != 2) {
-            fprintf(stderr, "Could not read line from log file\n");
-        }
-
-        points[2*i] = x;
-        points[2*i+1] = y;
-    }
-
-    return points;
-}
+#include "flake_log.h"
 
 typedef struct image_def {
     unsigned char *P;      // the pixels array
@@ -126,8 +96,8 @@ void generate_image(double *points, image_def image, int colorize, int limit) {
 }
 
 void render_log(FILE *log, char *filename, int colorize, int movie, int num_frames) {
-    int num_particles = find_number_of_particles(log);
-    double *points = read_log_file(log, num_particles);
+    int num_particles;
+    double *points = read_flake_log_as_array(log, &num_particles);
     image_def image = create_image_array(points, num_particles, colorize);
 
     if (movie) {
