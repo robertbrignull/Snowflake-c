@@ -12,11 +12,11 @@ int pix(int x, int y, int width, int height, int color) {
     return (x * height + y) * bytes_per_pixel(color);
 }
 
-int pixels_match(char *pixels, int pix1, int pix2, int color) {
+int pixels_match(unsigned char *pixels, int pix1, int pix2, int color) {
     return memcmp(&pixels[pix1], &pixels[pix2], (size_t) bytes_per_pixel(color)) == 0;
 }
 
-void write_run(FILE *out, char *pixels, int index, int l, int color) {
+void write_run(FILE *out, unsigned char *pixels, int index, int l, int color) {
     unsigned char header = (unsigned char) (127 + l);
     fwrite(&header, 1, 1, out);
 
@@ -28,7 +28,7 @@ void write_run(FILE *out, char *pixels, int index, int l, int color) {
 
 // Expects pixels to be of length width * height if greyscale or
 // or length width * height * 3 if color.
-void write_tga(char *filename, char *pixels, int width, int height, int color) {
+void write_tga(char *filename, unsigned char *pixels, int width, int height, int color) {
     FILE *out = fopen(filename, "w");
 
     if (out == 0) {

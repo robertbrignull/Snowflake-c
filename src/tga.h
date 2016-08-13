@@ -17,4 +17,4 @@ int pix(int x, int y, int width, int height, int color);
  * the index of a pixel within the 1D char array is
  * given by the function pix above.
  */
-void write_tga(char *filename, char *pixels, int width, int height, int color);
+void write_tga(char *filename, unsigned char *pixels, int width, int height, int color);

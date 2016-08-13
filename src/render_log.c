@@ -40,7 +40,7 @@ double *read_log_file(FILE *log, int num_particles) {
 }
 
 typedef struct image_def {
-    char *P;      // the pixels array
+    unsigned char *P;      // the pixels array
     size_t P_size;   // the length of the pixels array
     int width;    // the width of the image
     int height;   // the height of the image
@@ -75,33 +75,33 @@ image_def create_image_array(double *points, int num_particles, int colorize) {
     if (image.height % 2 == 1) image.height += 1;
 
     image.P_size = (size_t) image.width * image.height * bytes_per_pixel(colorize);
-    image.P = (char*) malloc(image.P_size);
+    image.P = (unsigned char*) malloc(image.P_size);
     CHECK_MEM(image.P);
 
     return image;
 }
 
-void hsv2rgb(double hue, char *r, char *g, char *b) {
+void hsv2rgb(double hue, unsigned char *r, unsigned char *g, unsigned char *b) {
     double hue_range = fmod(hue / 60.0, 6);
-    char x = (char) (255 * (1.0 - fabs(fmod(hue_range, 2.0) - 1.0)));
+    unsigned char x = (unsigned char) (255 * (1.0 - fabs(fmod(hue_range, 2.0) - 1.0)));
 
     if (hue_range < 1) {
-        *r = (char) 255; *g = x; *b = 0;
+        *r = (unsigned char) 255; *g = x; *b = 0;
     }
     else if (hue_range < 2) {
-        *r = x; *g = (char) 255; *b = 0;
+        *r = x; *g = (unsigned char) 255; *b = 0;
     }
     else if (hue_range < 3) {
-        *r = 0; *g = (char) 255; *b = x;
+        *r = 0; *g = (unsigned char) 255; *b = x;
     }
     else if (hue_range < 4) {
-        *r = 0; *g = x; *b = (char) 255;
+        *r = 0; *g = x; *b = (unsigned char) 255;
     }
     else if (hue_range < 5) {
-        *r = x; *g = 0; *b = (char) 255;
+        *r = x; *g = 0; *b = (unsigned char) 255;
     }
     else {
-        *r = (char) 255; *g = 0; *b = x;
+        *r = (unsigned char) 255; *g = 0; *b = x;
     }
 }
 
@@ -119,7 +119,7 @@ void generate_image(double *points, image_def image, int colorize, int limit) {
                 hsv2rgb(age, &image.P[index+0], &image.P[index+1], &image.P[index+2]);
             }
             else {
-                image.P[index] = (char) 255;
+                image.P[index] = (unsigned char) 255;
             }
         }
     }
