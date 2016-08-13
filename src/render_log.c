@@ -83,25 +83,25 @@ image_def create_image_array(double *points, int num_particles, int colorize) {
 
 void hsv2rgb(double hue, char *r, char *g, char *b) {
     double hue_range = fmod(hue / 60.0, 6);
-    char x = 255 * (1.0 - fabs(fmod(hue_range, 2.0) - 1.0));
+    char x = (char) (255 * (1.0 - fabs(fmod(hue_range, 2.0) - 1.0)));
 
     if (hue_range < 1) {
-        *r = 255; *g = x; *b = 0;
+        *r = (char) 255; *g = x; *b = 0;
     }
     else if (hue_range < 2) {
-        *r = x; *g = 255; *b = 0;
+        *r = x; *g = (char) 255; *b = 0;
     }
     else if (hue_range < 3) {
-        *r = 0; *g = 255; *b = x;
+        *r = 0; *g = (char) 255; *b = x;
     }
     else if (hue_range < 4) {
-        *r = 0; *g = x; *b = 255;
+        *r = 0; *g = x; *b = (char) 255;
     }
     else if (hue_range < 5) {
-        *r = x; *g = 0; *b = 255;
+        *r = x; *g = 0; *b = (char) 255;
     }
     else {
-        *r = 255; *g = 0; *b = x;
+        *r = (char) 255; *g = 0; *b = x;
     }
 }
 
@@ -119,7 +119,7 @@ void generate_image(double *points, image_def image, int colorize, int limit) {
                 hsv2rgb(age, &image.P[index+0], &image.P[index+1], &image.P[index+2]);
             }
             else {
-                image.P[index] = 255;
+                image.P[index] = (char) 255;
             }
         }
     }
@@ -133,7 +133,7 @@ void render_log(FILE *log, char *filename, int colorize, int movie, int num_fram
     if (movie) {
         char *frame_filename = (char*) malloc(strlen(filename) + 100);
         for (int frame = 0; frame < num_frames; frame++) {
-            int limit = 1.0 * num_particles * frame / num_frames;
+            int limit = (int) (1.0 * num_particles * frame / num_frames);
             sprintf(frame_filename, filename, limit);
             generate_image(points, image, colorize, limit);
             write_tga(frame_filename, image.P, image.width, image.height, colorize);

@@ -14,7 +14,7 @@ int main(int argc, char **argv) {
     lim.rlim_cur = lim.rlim_max = 6000000000L;
     setrlimit(RLIMIT_AS, &lim);
 
-    srand(time(0));
+    srand((unsigned int) time(0));
 
     arg_options *args = parse_args(argc, argv);
 
