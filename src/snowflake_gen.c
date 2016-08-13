@@ -103,7 +103,7 @@ void create_snowflake(int N, FILE *log) {
 
         // log the addition of this point
         if (log != 0) {
-            fprintf(log, "%d %f %f %d\n", n, x, y, num_iterations);
+            fprintf(log, "%f %f %d\n", x, y, num_iterations);
         }
 
         // update the creation and destruction boundaries

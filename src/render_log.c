@@ -28,7 +28,7 @@ double *read_log_file(FILE *log, int num_particles) {
 
     double x, y;
     for (int i = 0; i < num_particles; i++) {
-        if (fscanf(log, "%*d %lf %lf %*d", &x, &y) != 2) {
+        if (fscanf(log, "%lf %lf %*d", &x, &y) != 2) {
             fprintf(stderr, "Could not read line from log file\n");
         }
 
