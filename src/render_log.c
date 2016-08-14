@@ -40,6 +40,12 @@ image_def create_image_array(double *points, int num_particles, int colorize) {
     image.left = BW;
     image.top = BN;
 
+    // Add a border for prettyness
+    image.width += 20;
+    image.height += 20;
+    image.left -= 10;
+    image.top -= 10;
+
     // make the width and height a multiple of 2 to play nicely with ffmpeg
     if (image.width % 2 == 1) image.width += 1;
     if (image.height % 2 == 1) image.height += 1;
