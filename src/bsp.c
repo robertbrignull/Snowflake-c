@@ -131,16 +131,11 @@ void bsp_add_point_impl(bsp_t *b, int node_index, double node_x, double node_y, 
             double old_point_x = node.x;
             double old_point_y = node.y;
 
-            int SW = bsp_new_empty_node(b);
-            int SE = bsp_new_empty_node(b);
-            int NW = bsp_new_empty_node(b);
-            int NE = bsp_new_empty_node(b);
-
             node.type = BSP_CROSS;
-            node.SW = SW;
-            node.SE = SE;
-            node.NW = NW;
-            node.NE = NE;
+            node.SW = bsp_new_empty_node(b);
+            node.SE = bsp_new_empty_node(b);
+            node.NW = bsp_new_empty_node(b);
+            node.NE = bsp_new_empty_node(b);
             b->nodes[node_index] = node;
 
             bsp_add_point_impl(b, node_index, node_x, node_y, node_size);
