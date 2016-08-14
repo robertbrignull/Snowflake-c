@@ -97,6 +97,14 @@ int bsp_new_empty_node(bsp_t *b) {
     return i;
 }
 
+void bsp_add_to_empty_node(bsp_t *b, int node_index) {
+    bsp_node node = b->nodes[node_index];
+    node.type = BSP_POINT;
+    node.x = point_x;
+    node.y = point_y;
+    b->nodes[node_index] = node;
+}
+
 // Private method, adds a point to the tree
 void bsp_add_point_impl(bsp_t *b, int node_index, double node_x, double node_y, double node_size) {
     bsp_node node = b->nodes[node_index];
@@ -146,10 +154,7 @@ void bsp_add_point_impl(bsp_t *b, int node_index, double node_x, double node_y, 
         }
     }
     else {
-        node.type = BSP_POINT;
-        node.x = point_x;
-        node.y = point_y;
-        b->nodes[node_index] = node;
+        bsp_add_to_empty_node(b, node_index);
     }
 }
 
