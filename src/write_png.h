@@ -13,8 +13,8 @@ int bytes_per_pixel(int color);
 int pix(int x, int y, int width, int height, int color);
 
 /**
- * Creata .tga image file from the given pixels where
+ * Creata .png image file from the given pixels where
  * the index of a pixel within the 1D char array is
  * given by the function pix above.
  */
-void write_tga(char *filename, unsigned char *pixels, int width, int height, int color);
+void write_png(char *filename, unsigned char *pixels, int width, int height, int color);

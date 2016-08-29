@@ -7,7 +7,7 @@ To walk a particle, we don't simulate every step but make large jumps. We also w
 
 We use a bsp to store the snowflake as that was deemed to be the fastest datastructure for querying the nearest element to a point.
 
-The output format is TGA because that was the easiest to manually write.
+The output format is always png because it is lossless and offers excellent compression.
 
 ### Use
 
@@ -15,4 +15,4 @@ Compile by doing `cd build; cmake ..; make`
 
 Then from the base directory run `build/snowflake` for more instructions on how to use the program.
 
-To combine multiple images into a movie, use `ffmpeg -framerate 60 -pattern_type glob -i '*.tga' -c:v libx264rgb -pix_fmt bgr24 out.mp4`
+To combine multiple images into a movie, use `ffmpeg -framerate 60 -pattern_type glob -i '*.png' -c:v libx264rgb -pix_fmt bgr24 out.mp4`

@@ -25,13 +25,13 @@ void print_usage() {
     printf("    -i --input            Input of a previous snowflake run as a text file\n\n");
     printf("  Optional argumens:\n");
     printf("    -o --output           Output filename for image\n");
-    printf("                          Default is out/output.tga\n");
+    printf("                          Default is out/output.png\n");
     printf("    -c --colorize         Show pixel age through color\n");
     printf("                          Default is no color\n");
     printf("    -m --movie            Output all states as images instead of just the final flake\n");
     printf("                          Default is just to final frame\n");
     printf("                          If this is used then the output filename should be\n");
-    printf("                            provided as a format string, e.g. out/output_%%d.tga\n");
+    printf("                            provided as a format string, e.g. out/output_%%d.png\n");
     printf("    -f --frames           The number of frames to produce if making a movie\n\n");
 
     printf("Mode bsp_test\n");
@@ -122,7 +122,7 @@ arg_options *parse_args(int argc, char **argv) {
         int input_set = 0;
 
         // optional args
-        char *default_output = "out/output.tga";
+        char *default_output = "out/output.png";
         args->render.output = (char*) malloc(strlen(default_output) + 1);
         CHECK_MEM(args->render.output);
         strcpy(args->render.output, default_output);

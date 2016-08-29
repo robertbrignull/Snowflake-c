@@ -4,7 +4,7 @@
 #include <math.h>
 
 #include "algo.h"
-#include "tga.h"
+#include "write_png.h"
 
 #include "render_log.h"
 #include "flake_log.h"
@@ -112,12 +112,12 @@ void render_log(FILE *log, char *filename, int colorize, int movie, int num_fram
             int limit = (int) (1.0 * num_particles * frame / num_frames);
             sprintf(frame_filename, filename, limit);
             generate_image(points, image, colorize, limit);
-            write_tga(frame_filename, image.P, image.width, image.height, colorize);
+            write_png(frame_filename, image.P, image.width, image.height, colorize);
         }
     }
     else {
         generate_image(points, image, colorize, num_particles);
-        write_tga(filename, image.P, image.width, image.height, colorize);
+        write_png(filename, image.P, image.width, image.height, colorize);
     }
    
     free(points);
