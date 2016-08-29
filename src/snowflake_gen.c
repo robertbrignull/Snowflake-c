@@ -29,8 +29,6 @@ void create_snowflake(int N, FILE *log) {
     }
 
     for (int n = num_particles + 1; n <= num_particles + N; n++) {
-        if (n % 10000 == 0) printf("%d\n", n);
-
         // spawn somewhere on the bounding circle
         double spawn_dir = (double) rand();
         double x = creation_boundary * cos(spawn_dir);
@@ -107,6 +105,9 @@ void create_snowflake(int N, FILE *log) {
 
         // add the new point
         bsp_add_point(b, x, y);
+
+        // update the console progress
+        printf("\r%d particles", n);
 
         // log the addition of this point
         log_new_particle(log, x, y, num_iterations);
