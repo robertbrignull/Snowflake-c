@@ -20,6 +20,7 @@ void create_snowflake(int N, FILE *log) {
 
     if (num_particles == 0) {
         num_particles = 1;
+        N -= 1;
         bsp_add_point(b, 0.0, 0.0);
         log_new_particle(log, 0.0, 0.0, 0);
     }
