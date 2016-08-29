@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <fcntl.h>
+#include <zconf.h>
 
 #include "algo.h"
 #include "bsp.h"
@@ -29,7 +31,18 @@ void create_snowflake(int N, FILE *log) {
         destruction_boundary += farthest_particle;
     }
 
+    // Set up stdin for non-blocking IO
+    int flags = fcntl(STDIN_FILENO, F_GETFL, 0);
+    fcntl(STDIN_FILENO, F_SETFL, flags | O_NONBLOCK);
+
+    printf("Press enter to stop...\n");
+
     for (int n = num_particles + 1; n <= num_particles + N; n++) {
+        // Check if we should stop
+        if (getc(stdin) != -1) {
+            break;
+        }
+
         // spawn somewhere on the bounding circle
         double spawn_dir = (double) rand();
         double x = creation_boundary * cos(spawn_dir);
