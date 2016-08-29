@@ -13,9 +13,9 @@ void print_usage() {
 
     printf("Mode gen\n");
     printf("  generates a snowflake.\n\n");
-    printf("  Required argumens:\n");
-    printf("    -n --num_particles    The number of particles to simulate\n\n");
     printf("  Optional argumens:\n");
+    printf("    -n --num_particles    The number of particles to simulate\n");
+    printf("                          Default is no limit\n");
     printf("    -o --output           Output the snowflake as text file\n");
     printf("                          Default is out/output.flake\n\n");
 
@@ -80,8 +80,7 @@ arg_options *parse_args(int argc, char **argv) {
         args->mode = SNOWFLAKE_GEN;
 
         // required args
-        args->gen.num_particles = 0;
-        int num_particles_set = 0;
+        args->gen.num_particles = -1;
 
         // optional args
         char *default_output = "out/output.flake";
@@ -94,7 +93,6 @@ arg_options *parse_args(int argc, char **argv) {
             if (arg_matches(argv[argi], "--num-particles", "-n")) {
                 check_enough_parameters(argv[argi], argc, argi, 1);
                 args->gen.num_particles = atoi(argv[argi+1]);
-                num_particles_set = 1;
                 argi += 2;
             }
             else if (arg_matches(argv[argi], "--output", "-o")) {
@@ -108,10 +106,6 @@ arg_options *parse_args(int argc, char **argv) {
             else {
                 print_unrecognised_argument(argv[argi]);
             }
-        }
-
-        if (!num_particles_set) {
-            print_missing_argument("--num-particles");
         }
     }
     else if (arg_matches(argv[1], "render", 0)) { // RENDER

@@ -37,7 +37,10 @@ void create_snowflake(int N, FILE *log) {
 
     printf("Press enter to stop...\n");
 
-    for (int n = num_particles + 1; n <= num_particles + N; n++) {
+    int n = num_particles;
+    while (N < 0 || n < num_particles + N) {
+        n += 1;
+
         // Check if we should stop
         if (getc(stdin) != -1) {
             break;
