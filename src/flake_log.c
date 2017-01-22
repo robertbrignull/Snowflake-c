@@ -7,19 +7,25 @@
 
 #include "flake_log.h"
 
+typedef struct flake_log_line {
+    double x;
+    double y;
+    char num_iterations;
+} flake_log_line;
+
 void log_new_particle(FILE *flake, double x, double y, char num_iterations) {
-    fwrite(&x, sizeof(double), 1, flake);
-    fwrite(&y, sizeof(double), 1, flake);
-    fwrite(&num_iterations, sizeof(char), 1, flake);
+    flake_log_line line;
+    line.x = x;
+    line.y = y;
+    line.num_iterations = num_iterations;
+    fwrite(&line, sizeof(flake_log_line), 1, flake);
 }
 
 /**
  * @return did the operation succeed
  */
-int read_line_from_log(FILE *flake, double *x, double *y, char *num_iterations) {
-    return fread(x, sizeof(double), 1, flake) == 1 &&
-            fread(y, sizeof(double), 1, flake) == 1 &&
-            fread(num_iterations, sizeof(char), 1, flake) == 1;
+int read_line_from_log(FILE *flake, flake_log_line *line) {
+    return fread(line, sizeof(flake_log_line), 1, flake) == 1;
 }
 
 bsp_t *read_flake_log_as_bsp(FILE *flake, int *num_particles, double *farthest_particle) {
@@ -30,15 +36,14 @@ bsp_t *read_flake_log_as_bsp(FILE *flake, int *num_particles, double *farthest_p
     *num_particles = 0;
     *farthest_particle = 0.0;
 
-    double x, y;
-    char num_iterations;
-    while (read_line_from_log(flake, &x, &y, &num_iterations)) {
-        if (fabs(x) >= b->size || fabs(y) >= b->size) {
+    flake_log_line line;
+    while (read_line_from_log(flake, &line)) {
+        if (fabs(line.x) >= b->size || fabs(line.y) >= b->size) {
             b = bsp_change_size(b, b->size * 2);
         }
-        bsp_add_point(b, x, y);
+        bsp_add_point(b, line.x, line.y);
         *num_particles += 1;
-        *farthest_particle = fmax(*farthest_particle, dist_origin(x, y));
+        *farthest_particle = fmax(*farthest_particle, dist_origin(line.x, line.y));
     }
 
     return b;
@@ -48,7 +53,7 @@ int find_number_of_particles(FILE *flake) {
     fseek(flake, 0, SEEK_END);
     int size = (int) ftell(flake);
     fseek(flake, 0, SEEK_SET);
-    return size / (sizeof(double) * 2 + sizeof(char));
+    return size / sizeof(flake_log_line);
 }
 
 double *read_flake_log_as_array(FILE *flake, int *num_particles) {
@@ -58,17 +63,16 @@ double *read_flake_log_as_array(FILE *flake, int *num_particles) {
 
     fseek(flake, 0, SEEK_SET);
 
-    double x, y;
-    char num_iterations;
+    flake_log_line line;
     for (int i = 0; i < *num_particles; i++) {
-        if (!read_line_from_log(flake, &x, &y, &num_iterations)) {
+        if (!read_line_from_log(flake, &line)) {
             fprintf(stderr, "Could not read line %d from log file\n", i);
             free(points);
             return NULL;
         }
 
-        points[2*i] = x;
-        points[2*i+1] = y;
+        points[2*i] = line.x;
+        points[2*i+1] = line.y;
     }
 
     return points;
