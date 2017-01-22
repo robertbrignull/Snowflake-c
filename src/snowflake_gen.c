@@ -53,7 +53,7 @@ void create_snowflake(int N, FILE *log) {
 
         // set done to 1 once this particle collides
         int done = 0;
-        int num_iterations = 0;
+        char num_iterations = 0;
         while (!done) {
             num_iterations += 1;
 

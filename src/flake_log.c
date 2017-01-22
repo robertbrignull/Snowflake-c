@@ -7,19 +7,19 @@
 
 #include "flake_log.h"
 
-void log_new_particle(FILE *flake, double x, double y, int num_iterations) {
+void log_new_particle(FILE *flake, double x, double y, char num_iterations) {
     fwrite(&x, sizeof(double), 1, flake);
     fwrite(&y, sizeof(double), 1, flake);
-    fwrite(&num_iterations, sizeof(int), 1, flake);
+    fwrite(&num_iterations, sizeof(char), 1, flake);
 }
 
 /**
  * @return did the operation succeed
  */
-int read_line_from_log(FILE *flake, double *x, double *y, int *num_iterations) {
+int read_line_from_log(FILE *flake, double *x, double *y, char *num_iterations) {
     return fread(x, sizeof(double), 1, flake) == 1 &&
             fread(y, sizeof(double), 1, flake) == 1 &&
-            fread(num_iterations, sizeof(int), 1, flake) == 1;
+            fread(num_iterations, sizeof(char), 1, flake) == 1;
 }
 
 bsp_t *read_flake_log_as_bsp(FILE *flake, int *num_particles, double *farthest_particle) {
@@ -31,7 +31,7 @@ bsp_t *read_flake_log_as_bsp(FILE *flake, int *num_particles, double *farthest_p
     *farthest_particle = 0.0;
 
     double x, y;
-    int num_iterations;
+    char num_iterations;
     while (read_line_from_log(flake, &x, &y, &num_iterations)) {
         if (fabs(x) >= b->size || fabs(y) >= b->size) {
             b = bsp_change_size(b, b->size * 2);
@@ -48,7 +48,7 @@ int find_number_of_particles(FILE *flake) {
     fseek(flake, 0, SEEK_END);
     int size = (int) ftell(flake);
     fseek(flake, 0, SEEK_SET);
-    return size / (sizeof(double) * 2 + sizeof(int));
+    return size / (sizeof(double) * 2 + sizeof(char));
 }
 
 double *read_flake_log_as_array(FILE *flake, int *num_particles) {
@@ -59,7 +59,7 @@ double *read_flake_log_as_array(FILE *flake, int *num_particles) {
     fseek(flake, 0, SEEK_SET);
 
     double x, y;
-    int num_iterations;
+    char num_iterations;
     for (int i = 0; i < *num_particles; i++) {
         if (!read_line_from_log(flake, &x, &y, &num_iterations)) {
             fprintf(stderr, "Could not read line %d from log file\n", i);
