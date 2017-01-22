@@ -10,14 +10,12 @@
 typedef struct flake_log_line {
     double x;
     double y;
-    char num_iterations;
 } flake_log_line;
 
-void log_new_particle(FILE *flake, double x, double y, char num_iterations) {
+void log_new_particle(FILE *flake, double x, double y) {
     flake_log_line line;
     line.x = x;
     line.y = y;
-    line.num_iterations = num_iterations;
     fwrite(&line, sizeof(flake_log_line), 1, flake);
 }
 

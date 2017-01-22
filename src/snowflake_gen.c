@@ -24,7 +24,7 @@ void create_snowflake(int N, FILE *log) {
         num_particles = 1;
         N -= 1;
         bsp_add_point(b, 0.0, 0.0);
-        log_new_particle(log, 0.0, 0.0, 0);
+        log_new_particle(log, 0.0, 0.0);
     }
     else {
         creation_boundary += farthest_particle;
@@ -127,7 +127,7 @@ void create_snowflake(int N, FILE *log) {
         printf("\r%d particles", n);
 
         // log the addition of this point
-        log_new_particle(log, x, y, num_iterations);
+        log_new_particle(log, x, y);
 
         // update the creation and destruction boundaries
         double dis = dist_origin(x, y);
