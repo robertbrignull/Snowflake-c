@@ -71,9 +71,9 @@ void write_png(char *filename, unsigned char *pixels, int width, int height, int
             int row_index = x * bytes_per_pixel(color);
             int pixels_index = pix(x, y, width, height, color);
 
-            row[row_index] = pixels[pixels_index];
-            row[row_index + 1] = pixels[pixels_index + 1];
-            row[row_index + 2] = pixels[pixels_index + 2];
+            for (int i = 0; i < bytes_per_pixel(color); i++) {
+                row[row_index + i] = pixels[pixels_index + i];
+            }
         }
         png_write_row(png_ptr, row);
     }
