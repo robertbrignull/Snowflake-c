@@ -104,6 +104,11 @@ void generate_image(double *points, image_def image, int colorize, int limit) {
 void render_log(FILE *log, char *filename, int colorize, int movie, int num_frames) {
     int num_particles;
     double *points = read_flake_log_as_array(log, &num_particles);
+    if (points == NULL) {
+        fprintf(stderr, "Unable to render log");
+        return;
+    }
+
     image_def image = create_image_array(points, num_particles, colorize);
 
     if (movie) {

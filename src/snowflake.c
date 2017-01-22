@@ -21,13 +21,13 @@ int main(int argc, char **argv) {
     if (args->mode == SNOWFLAKE_GEN) {
         FILE *log = 0;
         if (args->gen.output != 0) {
-            log = fopen(args->gen.output, "a+");
+            log = fopen(args->gen.output, "a+b");
         }
 
         create_snowflake(args->gen.num_particles, log);
     }
     else if (args->mode == RENDER) {
-        FILE *log = fopen(args->render.input, "r");
+        FILE *log = fopen(args->render.input, "rb");
 
         render_log(log, args->render.output,
             args->render.colorize, args->render.movie, args->render.num_frames);
