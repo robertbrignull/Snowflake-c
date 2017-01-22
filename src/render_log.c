@@ -40,7 +40,7 @@ image_def create_image_array(double *points, int num_particles, int colorize) {
     image.left = BW;
     image.top = BN;
 
-    // Add a border for prettyness
+    // Add a border for prettiness
     image.width += 20;
     image.height += 20;
     image.left -= 10;
