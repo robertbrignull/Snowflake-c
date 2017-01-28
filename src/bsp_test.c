@@ -8,7 +8,7 @@
 #include "bsp_test.h"
 
 void test_basic_distances() {
-    printf("Starting test_basicDistances...");
+    printf("Starting test_basic_distances...");
 
     bsp_t *b = bsp_new(100.0);
 
@@ -28,7 +28,7 @@ void test_basic_distances() {
 }
 
 void test_crossing_boundaries() {
-    printf("Starting test_crossingBoundaries...");
+    printf("Starting test_crossing_boundaries...");
 
     bsp_t *b = bsp_new(100.0);
 
@@ -46,7 +46,7 @@ void test_crossing_boundaries() {
 }
 
 void test_point_added_twice() {
-    printf("Starting test_pointAddedTwice...");
+    printf("Starting test_point_added_twice...");
 
     bsp_t *b = bsp_new(100.0);
 
@@ -64,7 +64,7 @@ void test_point_added_twice() {
 }
 
 void test_empty_region() {
-    printf("Starting test_emptyRegion...");
+    printf("Starting test_empty_region...");
 
     bsp_t *b = bsp_new(100.0);
 
