@@ -18,6 +18,12 @@ void print_usage() {
     printf("                          Default is no limit\n");
     printf("    -o --output           Output the snowflake as text file\n");
     printf("                          Default is out/output.flake\n\n");
+    printf("    -d --symmetry-degree  The number of axis of symmetry to employ\n");
+    printf("                          Default is 6\n");
+    printf("    -t --symmetry-type    The type of symmetry to use. Options include:\n");
+    printf("                          none: no symmetry (default)\n");
+    printf("                          rotational: rotational symmetry\n");
+    printf("                          full: rotational and reflectional symmetry\n\n");
 
     printf("Mode render\n");
     printf("  render a snowflake from a previous run.\n\n");
@@ -88,6 +94,9 @@ arg_options *parse_args(int argc, char **argv) {
         CHECK_MEM(args->gen.output);
         strcpy(args->gen.output, default_output);
 
+        args->gen.symmetry_degree = 6;
+        args->gen.symmetry_type = NONE;
+
         int argi = 2;
         while (argi < argc) {
             if (arg_matches(argv[argi], "--num-particles", "-n")) {
@@ -101,6 +110,27 @@ arg_options *parse_args(int argc, char **argv) {
                     (char*) realloc(args->gen.output, strlen(argv[argi+1]) + 1);
                 CHECK_MEM(args->gen.output);
                 strcpy(args->gen.output, argv[argi+1]);
+                argi += 2;
+            }
+            else if (arg_matches(argv[argi], "--symmetry-degree", "-d")) {
+                check_enough_parameters(argv[argi], argc, argi, 1);
+                args->gen.symmetry_degree = atoi(argv[argi+1]);
+                argi += 2;
+            }
+            else if (arg_matches(argv[argi], "--symmetry-type", "-t")) {
+                check_enough_parameters(argv[argi], argc, argi, 1);
+                if (arg_matches(argv[argi+1], "none", 0)) {
+                    args->gen.symmetry_type = NONE;
+                }
+                else if (arg_matches(argv[argi+1], "rotational", 0)) {
+                    args->gen.symmetry_type = ROTATIONAL;
+                }
+                else if (arg_matches(argv[argi+1], "full", 0)) {
+                    args->gen.symmetry_type = FULL;
+                }
+                else {
+                    print_unrecognised_argument(argv[argi+1]);
+                }
                 argi += 2;
             }
             else {

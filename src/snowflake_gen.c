@@ -10,7 +10,15 @@
 
 #include "snowflake_gen.h"
 
-void create_snowflake(int N, FILE *log) {
+void add_point(bsp_t *b, FILE *log, double x, double y) {
+    // add the new point
+    bsp_add_point(b, x, y);
+
+    // log the addition of this point
+    log_new_particle(log, x, y);
+}
+
+void create_snowflake(int N, FILE *log, int symmetry_degree, symmetry_type_enum symmetry_type) {
     int num_particles = 0;
     double farthest_particle = 0.0;
     bsp_t *b = read_flake_log_as_bsp(log, &num_particles, &farthest_particle);
@@ -39,8 +47,6 @@ void create_snowflake(int N, FILE *log) {
 
     int n = num_particles;
     while (N < 0 || n < num_particles + N) {
-        n += 1;
-
         // Check if we should stop
         if (getc(stdin) != -1) {
             break;
@@ -115,22 +121,39 @@ void create_snowflake(int N, FILE *log) {
             }
         } // particle has collided
 
+        double dis = dist_origin(x, y);
+
         // possibly increase the BSP size
-        if (x <= -b->size || x >= b->size || y <= -b->size || y >= b->size) {
+        if (dis >= b->size) {
             b = bsp_change_size(b, b->size * 2);
         }
 
-        // add the new point
-        bsp_add_point(b, x, y);
+        if (symmetry_type == NONE) {
+            add_point(b, log, x, y);
 
-        // update the console progress
-        printf("\r%d particles", n);
+            // update the console progress
+            n += 1;
+            printf("\r%d particles", n);
+        }
+        else {
+            double r = atan2(y, x);
+            double rotation_per_degree = 2.0 * M_PI / symmetry_degree;
+            for (int degree = 0; degree < symmetry_degree; degree++) {
+                double xp = dis * cos(r);
+                double yp = dis * sin(r);
+                add_point(b, log, xp, yp);
+                if (symmetry_type == FULL) {
+                    add_point(b, log, -xp, yp);
+                }
+                r += rotation_per_degree;
+            }
 
-        // log the addition of this point
-        log_new_particle(log, x, y);
+            // update the console progress
+            n += symmetry_degree * ((symmetry_type == FULL) ? 2 : 1);
+            printf("\r%d particles", n);
+        }
 
         // update the creation and destruction boundaries
-        double dis = dist_origin(x, y);
         creation_boundary = fmax(creation_boundary, dis + creation_standoff);
         destruction_boundary = fmax(destruction_boundary, dis + destruction_standoff);
     }
