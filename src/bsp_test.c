@@ -7,6 +7,41 @@
 
 #include "bsp_test.h"
 
+void test_create_bsp() {
+    printf("Starting test_create_bsp...");
+
+    bsp_t *b = bsp_new(100.0);
+
+    bsp_destroy(b);
+
+    printf(" Done\n");
+}
+
+void test_add_single_point() {
+    printf("Starting test_create_bsp...");
+
+    bsp_t *b = bsp_new(100.0);
+
+    bsp_add_point(b, 1.0, 2.0);
+
+    bsp_destroy(b);
+
+    printf(" Done\n");
+}
+
+void test_add_multiple_point() {
+    printf("Starting test_create_bsp...");
+
+    bsp_t *b = bsp_new(100.0);
+
+    bsp_add_point(b, 1.0, 2.0);
+    bsp_add_point(b, -1.0, 0.0);
+
+    bsp_destroy(b);
+
+    printf(" Done\n");
+}
+
 void test_basic_distances() {
     printf("Starting test_basic_distances...");
 
@@ -170,6 +205,9 @@ void test_random() {
 }
 
 void run_bsp_tests() {
+    test_create_bsp();
+    test_add_single_point();
+    test_add_multiple_point();
     test_basic_distances();
     test_crossing_boundaries();
     test_point_added_twice();
