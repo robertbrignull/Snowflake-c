@@ -27,7 +27,7 @@ typedef struct bsp_t {
     // The size of this bsp tree
     double size;
 
-    // A dynamically allocated array of nodes, with the root at index 1
+    // A dynamically allocated array of nodes, with the root at index 0
     bsp_node *nodes;
 
     // The size of the nodes array
