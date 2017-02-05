@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
 
 #include "algo.h"
 
@@ -30,12 +31,18 @@ bsp_t *bsp_new(double S) {
     b->nodes[0].type = BSP_EMPTY;
     b->num_nodes = 1;
 
+    b->buckets_size = 1000;
+    b->buckets = (bsp_bucket*) malloc(sizeof(bsp_bucket) * b->buckets_size);
+    CHECK_MEM(b->buckets);
+    b->num_buckets = 0;
+
     return b;
 }
 
 // Destroys the tree, freeing memory
 void bsp_destroy(bsp_t *b) {
     free(b->nodes);
+    free(b->buckets);
     free(b);
 }
 
@@ -46,8 +53,11 @@ bsp_t *bsp_change_size(bsp_t *b, double new_size) {
 
     for (int i = 0; i < b->num_nodes; i++) {
         bsp_node node = b->nodes[i];
-        if (node.type == BSP_POINT) {
-            bsp_add_point(new_b, node.point.x, node.point.y);
+        if (node.type == BSP_BUCKET) {
+            bsp_bucket *bucket = &(b->buckets[node.bucket]);
+            for (int i = 0; i < bucket->size; i++) {
+                bsp_add_point(new_b, bucket->points[i].x, bucket->points[i].y);
+            }
         }
     }
 
@@ -98,18 +108,38 @@ int bsp_new_empty_node(bsp_t *b) {
 }
 
 void bsp_add_to_empty_node(bsp_t *b, int node_index) {
+    if (b->num_buckets == b->buckets_size) {
+        b->buckets_size *= 2;
+        b->buckets = (bsp_bucket*) realloc(b->buckets, sizeof(bsp_bucket) * b->buckets_size);
+        CHECK_MEM(b->buckets);
+    }
+
     bsp_node node = b->nodes[node_index];
-    node.type = BSP_POINT;
-    node.point.x = point_x;
-    node.point.y = point_y;
+    node.type = BSP_BUCKET;
+    node.bucket = b->num_buckets;
+    b->num_buckets++;
+
+    bsp_bucket *bucket = &(b->buckets[node.bucket]);
+    bucket->points[0].x = point_x;
+    bucket->points[0].y = point_y;
+    bucket->size = 1;
+
     b->nodes[node_index] = node;
 }
 
-void bsp_add_to_point_node(bsp_t *b, int node_index, double node_x, double node_y, double node_size) {
+void bsp_add_to_bucket_node(bsp_t *b, int node_index, double node_x, double node_y, double node_size) {
     bsp_node node = b->nodes[node_index];
-    if (node.point.x != point_x || node.point.y != point_y) {
-        double old_point_x = node.point.x;
-        double old_point_y = node.point.y;
+    bsp_bucket *bucket = &(b->buckets[node.bucket]);
+
+    if (bucket->size != BSP_BUCKET_SIZE) {
+        bucket->points[bucket->size].x = point_x;
+        bucket->points[bucket->size].y = point_y;
+        bucket->size += 1;
+    }
+    else {
+        bsp_point old_points[BSP_BUCKET_SIZE];
+        memcpy(old_points, bucket->points, sizeof(bsp_point) * BSP_BUCKET_SIZE);
+        int num_old_points = bucket->size;
 
         node.type = BSP_CROSS;
         node.SW = bsp_new_empty_node(b);
@@ -120,9 +150,11 @@ void bsp_add_to_point_node(bsp_t *b, int node_index, double node_x, double node_
 
         bsp_add_point_impl(b, node_index, node_x, node_y, node_size);
 
-        point_x = old_point_x;
-        point_y = old_point_y;
-        bsp_add_point_impl(b, node_index, node_x, node_y, node_size);
+        for (int i = 0; i < num_old_points; i++) {
+            point_x = old_points[i].x;
+            point_y = old_points[i].y;
+            bsp_add_point_impl(b, node_index, node_x, node_y, node_size);
+        }
     }
 }
 
@@ -155,8 +187,8 @@ void bsp_add_point_impl(bsp_t *b, int node_index, double node_x, double node_y, 
         node = b->nodes[node_index];
     }
 
-    if (node.type == BSP_POINT) {
-        bsp_add_to_point_node(b, node_index, node_x, node_y, node_size);
+    if (node.type == BSP_BUCKET) {
+        bsp_add_to_bucket_node(b, node_index, node_x, node_y, node_size);
     }
     else {
         bsp_add_to_empty_node(b, node_index);
@@ -246,11 +278,22 @@ bsp_result bsp_find_nearest_impl(bsp_t *b, int node_index, double node_x, double
             return min_bsp_result(r, bsp_find_nearest_impl(b, F, node_x + node_size / 2 * (1 - N_x_modifier), node_y + node_size / 2 * (1 - N_y_modifier), node_size / 2));
         }
     }
-    else if (node.type == BSP_POINT) {
+    else if (node.type == BSP_BUCKET) {
+        bsp_bucket *bucket = &(b->buckets[node.bucket]);
+
         bsp_result r;
-        r.x = node.point.x;
-        r.y = node.point.y;
-        r.d = dist(point_x, point_y, node.point.x, node.point.y);
+        r.x = bucket->points[0].x;
+        r.y = bucket->points[0].y;
+        r.d = dist(point_x, point_y, bucket->points[0].x, bucket->points[0].y);
+
+        for (int i = 1; i < bucket->size; i++) {
+            bsp_result r2;
+            r2.x = bucket->points[i].x;
+            r2.y = bucket->points[i].y;
+            r2.d = dist(point_x, point_y, bucket->points[i].x, bucket->points[i].y);
+            r = min_bsp_result(r, r2);
+        }
+
         return r;
     }
     else {
@@ -279,8 +322,14 @@ void bsp_print_impl(bsp_t *b, int node_index, double node_x, double node_y, doub
         bsp_print_impl(b, node.NE, node_x + node_size / 2, node_y + node_size / 2, node_size / 2);
         printf(")");
     }
-    else if (node.type == BSP_POINT) {
-        printf("Point(%d, (%.1f, %.1f, %.1f), %.1f, %.1f)", node_index, node_x, node_y, node_size, node.point.x, node.point.y);
+    else if (node.type == BSP_BUCKET) {
+        printf("Bucket(%d, (%.1f, %.1f, %.1f), [", node_index, node_x, node_y, node_size);
+        bsp_bucket *bucket = &(b->buckets[node.bucket]);
+        for (int i = 0; i < bucket->size; i++) {
+            if (i != 0) printf(", ");
+            printf("(%.1f, %.1f)", bucket->points[i].x, bucket->points[i].y);
+        }
+        printf("])");
     }
     else {
         printf("Empty(%d, (%.1f, %.1f, %.1f))", node_index, node_x, node_y, node_size);

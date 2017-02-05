@@ -1,19 +1,28 @@
 #pragma once
 
-typedef enum bsp_type_e {BSP_CROSS, BSP_POINT, BSP_EMPTY} bsp_type_e;
+typedef enum bsp_type_e {BSP_CROSS, BSP_BUCKET, BSP_EMPTY} bsp_type_e;
 
 typedef struct bsp_point {
     double x, y;
 } bsp_point;
+
+#define BSP_BUCKET_SIZE 50
+typedef struct bsp_bucket {
+    // A statically allocated array of points
+    bsp_point points[BSP_BUCKET_SIZE];
+
+    // How many points are in this bucket
+    int size;
+} bsp_bucket;
 
 typedef struct bsp_node {
     // The type of this node, determines how to use the union below
     bsp_type_e type;
 
     union {
-        // If this node is a point then this contains
-        // the coordinates of that point
-        bsp_point point; 
+        // If this node is a bucket then this contains
+        // the index in to the buckets array
+        int bucket;
 
         // If this node is a cross then this contains
         // the indexes of its children
@@ -35,6 +44,15 @@ typedef struct bsp_t {
 
     // The number of nodes in the array
     int num_nodes;
+
+    // A dynamically allocated array of buckets
+    bsp_bucket *buckets;
+
+    // The size of the buckets array
+    int buckets_size;
+
+    // The number of buckets in the array
+    int num_buckets;
 } bsp_t;
 
 typedef struct bsp_result {
