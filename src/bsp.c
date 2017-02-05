@@ -47,7 +47,7 @@ bsp_t *bsp_change_size(bsp_t *b, double new_size) {
     for (int i = 0; i < b->num_nodes; i++) {
         bsp_node node = b->nodes[i];
         if (node.type == BSP_POINT) {
-            bsp_add_point(new_b, node.x, node.y);
+            bsp_add_point(new_b, node.point.x, node.point.y);
         }
     }
 
@@ -100,16 +100,16 @@ int bsp_new_empty_node(bsp_t *b) {
 void bsp_add_to_empty_node(bsp_t *b, int node_index) {
     bsp_node node = b->nodes[node_index];
     node.type = BSP_POINT;
-    node.x = point_x;
-    node.y = point_y;
+    node.point.x = point_x;
+    node.point.y = point_y;
     b->nodes[node_index] = node;
 }
 
 void bsp_add_to_point_node(bsp_t *b, int node_index, double node_x, double node_y, double node_size) {
     bsp_node node = b->nodes[node_index];
-    if (node.x != point_x || node.y != point_y) {
-        double old_point_x = node.x;
-        double old_point_y = node.y;
+    if (node.point.x != point_x || node.point.y != point_y) {
+        double old_point_x = node.point.x;
+        double old_point_y = node.point.y;
 
         node.type = BSP_CROSS;
         node.SW = bsp_new_empty_node(b);
@@ -248,9 +248,9 @@ bsp_result bsp_find_nearest_impl(bsp_t *b, int node_index, double node_x, double
     }
     else if (node.type == BSP_POINT) {
         bsp_result r;
-        r.x = node.x;
-        r.y = node.y;
-        r.d = dist(point_x, point_y, node.x, node.y);
+        r.x = node.point.x;
+        r.y = node.point.y;
+        r.d = dist(point_x, point_y, node.point.x, node.point.y);
         return r;
     }
     else {
@@ -280,7 +280,7 @@ void bsp_print_impl(bsp_t *b, int node_index, double node_x, double node_y, doub
         printf(")");
     }
     else if (node.type == BSP_POINT) {
-        printf("Point(%d, (%.1f, %.1f, %.1f), %.1f, %.1f)", node_index, node_x, node_y, node_size, node.x, node.y);
+        printf("Point(%d, (%.1f, %.1f, %.1f), %.1f, %.1f)", node_index, node_x, node_y, node_size, node.point.x, node.point.y);
     }
     else {
         printf("Empty(%d, (%.1f, %.1f, %.1f))", node_index, node_x, node_y, node_size);

@@ -2,6 +2,10 @@
 
 typedef enum bsp_type_e {BSP_CROSS, BSP_POINT, BSP_EMPTY} bsp_type_e;
 
+typedef struct bsp_point {
+    double x, y;
+} bsp_point;
+
 typedef struct bsp_node {
     // The type of this node, determines how to use the union below
     bsp_type_e type;
@@ -9,9 +13,7 @@ typedef struct bsp_node {
     union {
         // If this node is a point then this contains
         // the coordinates of that point
-        struct {
-            double x, y;
-        };
+        bsp_point point; 
 
         // If this node is a cross then this contains
         // the indexes of its children
