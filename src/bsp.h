@@ -1,6 +1,6 @@
 #pragma once
 
-typedef enum bsp_type_e {BSP_CROSS, BSP_BUCKET, BSP_EMPTY} bsp_type_e;
+typedef enum bsp_type_e {BSP_CROSS, BSP_BUCKET} bsp_type_e;
 
 typedef struct bsp_point {
     double x, y;

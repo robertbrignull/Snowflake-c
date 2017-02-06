@@ -28,13 +28,15 @@ bsp_t *bsp_new(double S) {
     b->nodes = (bsp_node*) malloc(sizeof(bsp_node) * b->nodes_size);
     CHECK_MEM(b->nodes);
 
-    b->nodes[0].type = BSP_EMPTY;
-    b->num_nodes = 1;
-
     b->buckets_size = 1000;
     b->buckets = (bsp_bucket*) malloc(sizeof(bsp_bucket) * b->buckets_size);
     CHECK_MEM(b->buckets);
-    b->num_buckets = 0;
+
+    b->nodes[0].type = BSP_BUCKET;
+    b->nodes[0].bucket = 0;
+    b->buckets[0].size = 0;
+    b->num_nodes = 1;
+    b->num_buckets = 1;
 
     return b;
 }
@@ -100,31 +102,20 @@ int bsp_new_empty_node(bsp_t *b) {
         CHECK_MEM(b->nodes);
     }
 
-    int i = b->num_nodes;
-    b->nodes[i].type = BSP_EMPTY;
-    b->num_nodes++;
-
-    return i;
-}
-
-void bsp_add_to_empty_node(bsp_t *b, int node_index) {
     if (b->num_buckets == b->buckets_size) {
         b->buckets_size *= 2;
         b->buckets = (bsp_bucket*) realloc(b->buckets, sizeof(bsp_bucket) * b->buckets_size);
         CHECK_MEM(b->buckets);
     }
 
-    bsp_node node = b->nodes[node_index];
-    node.type = BSP_BUCKET;
-    node.bucket = b->num_buckets;
+    int i = b->num_nodes;
+    b->nodes[i].type = BSP_BUCKET;
+    b->nodes[i].bucket = b->num_buckets;
+    b->buckets[b->num_buckets].size = 0;
+    b->num_nodes++;
     b->num_buckets++;
 
-    bsp_bucket *bucket = &(b->buckets[node.bucket]);
-    bucket->points[0].x = point_x;
-    bucket->points[0].y = point_y;
-    bucket->size = 1;
-
-    b->nodes[node_index] = node;
+    return i;
 }
 
 void bsp_add_to_bucket_node(bsp_t *b, int node_index, double node_x, double node_y, double node_size) {
@@ -187,12 +178,7 @@ void bsp_add_point_impl(bsp_t *b, int node_index, double node_x, double node_y, 
         node = b->nodes[node_index];
     }
 
-    if (node.type == BSP_BUCKET) {
-        bsp_add_to_bucket_node(b, node_index, node_x, node_y, node_size);
-    }
-    else {
-        bsp_add_to_empty_node(b, node_index);
-    }
+    bsp_add_to_bucket_node(b, node_index, node_x, node_y, node_size);
 }
 
 bsp_result min_bsp_result(bsp_result r1, bsp_result r2) {
