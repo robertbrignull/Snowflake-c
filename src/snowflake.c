@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
+#include <sys/time.h>
 #include <sys/resource.h>
 
 #include "arg_parsing.h"
@@ -14,7 +14,9 @@ int main(int argc, char **argv) {
     lim.rlim_cur = lim.rlim_max = 6000000000L;
     setrlimit(RLIMIT_AS, &lim);
 
-    srand((unsigned int) time(0));
+    struct timeval t;
+    gettimeofday(&t, 0);
+    srand((unsigned int) t.tv_usec);
 
     arg_options *args = parse_args(argc, argv);
 
