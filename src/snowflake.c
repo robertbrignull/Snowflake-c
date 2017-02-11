@@ -3,10 +3,10 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 
-#include "arg_parsing.h"
-#include "bsp_test.h"
-#include "render_log.h"
-#include "snowflake_gen.h"
+#include "args/arg_parsing.h"
+#include "data/bsp/bsp_test.h"
+#include "render/render_log.h"
+#include "gen/snowflake_gen.h"
 
 int main(int argc, char **argv) {
     // Limit memory usage to around 6GB

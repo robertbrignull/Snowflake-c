@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <png.h>
 
-#include "write_png.h"
+#include "render/write_png.h"
 
 int bytes_per_pixel(int color) {
     return color ? 3 : 1;

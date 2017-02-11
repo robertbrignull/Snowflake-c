@@ -4,10 +4,10 @@
 #include <math.h>
 
 #include "algo.h"
-#include "write_png.h"
+#include "render/write_png.h"
+#include "log/flake_log.h"
 
-#include "render_log.h"
-#include "flake_log.h"
+#include "render/render_log.h"
 
 typedef struct image_def {
     unsigned char *P;      // the pixels array

@@ -3,9 +3,9 @@
 #include <sys/time.h>
 #include <assert.h>
 
-#include "bsp.h"
+#include "data/bsp/bsp.h"
 
-#include "bsp_test.h"
+#include "data/bsp/bsp_test.h"
 
 void test_create_bsp() {
     printf("Starting test_create_bsp...");

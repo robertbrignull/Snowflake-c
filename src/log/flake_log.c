@@ -3,9 +3,9 @@
 #include <math.h>
 
 #include "algo.h"
-#include "bsp.h"
+#include "data/bsp/bsp.h"
 
-#include "flake_log.h"
+#include "log/flake_log.h"
 
 typedef struct flake_log_line {
     double x;

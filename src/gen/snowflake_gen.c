@@ -5,10 +5,10 @@
 #include <zconf.h>
 
 #include "algo.h"
-#include "bsp.h"
-#include "flake_log.h"
+#include "data/bsp/bsp.h"
+#include "log/flake_log.h"
 
-#include "snowflake_gen.h"
+#include "gen/snowflake_gen.h"
 
 void add_point(bsp_t *b, FILE *log, double x, double y) {
     // add the new point

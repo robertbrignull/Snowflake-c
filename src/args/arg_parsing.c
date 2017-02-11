@@ -4,7 +4,7 @@
 
 #include "algo.h"
 
-#include "arg_parsing.h"
+#include "args/arg_parsing.h"
 
 void print_usage(int exit_code) {
     printf("Usage: snowflake mode [args...]\n");

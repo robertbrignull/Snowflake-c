@@ -5,7 +5,7 @@
 
 #include "algo.h"
 
-#include "bsp.h"
+#include "data/bsp/bsp.h"
 
 // Declare private functions
 int bsp_new_empty_node(bsp_t *b);
