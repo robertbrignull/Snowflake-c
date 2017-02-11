@@ -85,10 +85,8 @@ arg_options *parse_args(int argc, char **argv) {
     if (arg_matches(argv[1], "gen", 0)) { // SNOWFLAKE_GEN
         args->mode = SNOWFLAKE_GEN;
 
-        // required args
-        args->gen.num_particles = -1;
-
         // optional args
+        args->gen.num_particles = -1;
         char *default_output = "out/output.flake";
         args->gen.output = (char*) malloc(strlen(default_output) + 1);
         CHECK_MEM(args->gen.output);
