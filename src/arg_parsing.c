@@ -35,7 +35,7 @@ void print_usage() {
     printf("    -c --colorize         Show pixel age through color\n");
     printf("                          Default is no color\n");
     printf("    -m --movie            Output all states as images instead of just the final flake\n");
-    printf("                          Default is just to final frame\n");
+    printf("                          Default is just the final frame\n");
     printf("                          If this is used then the output filename should be\n");
     printf("                            provided as a format string, e.g. out/output_%%d.png\n");
     printf("    -f --frames           The number of frames to produce if making a movie\n\n");
@@ -199,7 +199,7 @@ arg_options *parse_args(int argc, char **argv) {
         }
 
         if (!input_set) {
-            print_missing_argument("--log");
+            print_missing_argument("--input");
         }
 
         if (args->render.movie && !num_frames_set) {
