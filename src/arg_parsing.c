@@ -6,7 +6,7 @@
 
 #include "arg_parsing.h"
 
-void print_usage() {
+void print_usage(int exit_code) {
     printf("Usage: snowflake mode [args...]\n");
     printf("       snowflake --help\n");
     printf("  where mode is one gen, render, or bsp_test\n\n");
@@ -44,24 +44,24 @@ void print_usage() {
     printf("  runs tests on the BSP implementation.\n\n");
     printf("  no arguments\n\n");
 
-    exit(0);
+    exit(exit_code);
 }
 
 void print_missing_argument(char *arg) {
     printf("Missing argument %s\n\n", arg);
-    print_usage();
+    print_usage(1);
 }
 
 void print_unrecognised_argument(char *arg) {
     printf("Unrecognised argument %s\n\n", arg);
-    print_usage();
+    print_usage(1);
 }
 
 void check_enough_parameters(char *arg, int argc, int argi, int num_params_expected) {
     if (argi + 1 >= argc) {
         printf("Argument %s expected %d parameters but found %d\n\n",
             arg, num_params_expected, argc - argi - 1);
-        print_usage();
+        print_usage(1);
     }
 }
 
@@ -72,7 +72,7 @@ int arg_matches(char *actual_arg, char *long_arg, char *short_arg) {
 
 arg_options *parse_args(int argc, char **argv) {
     if (argc >= 2 && arg_matches(argv[1], "--help", "-h")) {
-        print_usage();
+        print_usage(0);
     }
 
     arg_options *args = (arg_options*) malloc(sizeof(arg_options));
