@@ -9,6 +9,7 @@ typedef struct arg_options_gen {
     char *output;
     int symmetry_degree;
     symmetry_type_enum symmetry_type;
+    int silent;
 } arg_options_gen;
 
 typedef struct arg_options_render {

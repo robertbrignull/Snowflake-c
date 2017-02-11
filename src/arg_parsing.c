@@ -24,7 +24,8 @@ void print_usage(int exit_code) {
     printf("    -t --symmetry-type    The type of symmetry to use. Options include:\n");
     printf("                          - none: no symmetry (default)\n");
     printf("                          - rotational: rotational symmetry\n");
-    printf("                          - full: rotational and reflectional symmetry\n\n");
+    printf("                          - full: rotational and reflectional symmetry\n");
+    printf("    -s --silent           Don't output progress\n\n");
 
     printf("Mode render\n");
     printf("  render a snowflake from a previous run.\n\n");
@@ -93,6 +94,7 @@ arg_options *parse_args(int argc, char **argv) {
         args->gen.num_particles = -1;
         args->gen.symmetry_degree = 6;
         args->gen.symmetry_type = NONE;
+        args->gen.silent = 0;
 
         int argi = 2;
         while (argi < argc) {
@@ -130,6 +132,10 @@ arg_options *parse_args(int argc, char **argv) {
                     print_unrecognised_argument(argv[argi+1]);
                 }
                 argi += 2;
+            }
+            else if (arg_matches(argv[argi], "--silent", "-s")) {
+                args->gen.silent = 1;
+                argi += 1;
             }
             else {
                 print_unrecognised_argument(argv[argi]);

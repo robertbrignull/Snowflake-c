@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
             log = fopen(args->gen.output, "a+b");
         }
 
-        create_snowflake(args->gen.num_particles, log, args->gen.symmetry_degree, args->gen.symmetry_type);
+        create_snowflake(args->gen.num_particles, log, args->gen.symmetry_degree, args->gen.symmetry_type, args->gen.silent);
     }
     else if (args->mode == RENDER) {
         FILE *log = fopen(args->render.input, "rb");

@@ -18,7 +18,7 @@ void add_point(bsp_t *b, FILE *log, double x, double y) {
     log_new_particle(log, x, y);
 }
 
-void create_snowflake(int N, FILE *log, int symmetry_degree, symmetry_type_enum symmetry_type) {
+void create_snowflake(int N, FILE *log, int symmetry_degree, symmetry_type_enum symmetry_type, int silent) {
     int num_particles = 0;
     double farthest_particle = 0.0;
     bsp_t *b = read_flake_log_as_bsp(log, &num_particles, &farthest_particle);
@@ -43,7 +43,9 @@ void create_snowflake(int N, FILE *log, int symmetry_degree, symmetry_type_enum 
     int flags = fcntl(STDIN_FILENO, F_GETFL, 0);
     fcntl(STDIN_FILENO, F_SETFL, flags | O_NONBLOCK);
 
-    printf("Press enter to stop...\n");
+    if (!silent) {
+        printf("Press enter to stop...\n");
+    }
 
     int n = num_particles;
     while (N < 0 || n < num_particles + N) {
@@ -133,7 +135,6 @@ void create_snowflake(int N, FILE *log, int symmetry_degree, symmetry_type_enum 
 
             // update the console progress
             n += 1;
-            printf("\r%d particles", n);
         }
         else {
             double r = atan2(y, x);
@@ -150,6 +151,9 @@ void create_snowflake(int N, FILE *log, int symmetry_degree, symmetry_type_enum 
 
             // update the console progress
             n += symmetry_degree * ((symmetry_type == FULL) ? 2 : 1);
+        }
+
+        if (!silent) {
             printf("\r%d particles", n);
         }
 
