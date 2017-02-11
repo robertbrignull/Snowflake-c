@@ -21,9 +21,9 @@ void print_usage() {
     printf("    -d --symmetry-degree  The number of axis of symmetry to employ\n");
     printf("                          Default is 6\n");
     printf("    -t --symmetry-type    The type of symmetry to use. Options include:\n");
-    printf("                          none: no symmetry (default)\n");
-    printf("                          rotational: rotational symmetry\n");
-    printf("                          full: rotational and reflectional symmetry\n\n");
+    printf("                          - none: no symmetry (default)\n");
+    printf("                          - rotational: rotational symmetry\n");
+    printf("                          - full: rotational and reflectional symmetry\n\n");
 
     printf("Mode render\n");
     printf("  render a snowflake from a previous run.\n\n");
