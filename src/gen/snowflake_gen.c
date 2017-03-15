@@ -87,7 +87,7 @@ void create_snowflake(int N, FILE *log, int symmetry_degree, symmetry_type_enum 
                 }
                 // Check if we've left the area
                 else if (dist_origin(x, y) > destruction_boundary) {
-                    // Use conformals maps to map (x, y) back onto the creation boundary
+                    // Use conformal maps to map (x, y) back onto the creation boundary
                     double map_dir = (double) rand();
                     double x1 = cos(map_dir);
                     double y1 = sin(map_dir);
