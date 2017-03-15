@@ -32,7 +32,7 @@ int main(int argc, char **argv) {
         FILE *log = fopen(args->render.input, "rb");
 
         render_log(log, args->render.output,
-            args->render.colorize, args->render.movie, args->render.num_frames);
+            args->render.colorize, args->render.movie, args->render.num_frames, args->render.silent);
     }
     else if (args->mode == BSP_TEST) {
         run_bsp_tests();

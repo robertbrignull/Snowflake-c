@@ -103,7 +103,7 @@ void generate_image(double *points, image_def image, int colorize, int limit) {
     }
 }
 
-void render_log(FILE *log, char *filename, int colorize, int movie, int num_frames) {
+void render_log(FILE *log, char *filename, int colorize, int movie, int num_frames, int silent) {
     int num_particles;
     double *points = read_flake_log_as_array(log, &num_particles);
     if (points == NULL) {
@@ -111,7 +111,9 @@ void render_log(FILE *log, char *filename, int colorize, int movie, int num_fram
         return;
     }
 
-    printf("Press enter to stop...\n");
+    if (!silent) {
+        printf("Press enter to stop...\n");
+    }
 
     image_def image = create_image_array(points, num_particles, colorize);
 
@@ -131,7 +133,10 @@ void render_log(FILE *log, char *filename, int colorize, int movie, int num_fram
             sprintf(frame_filename, filename, limit);
             generate_image(points, image, colorize, limit);
             write_png(frame_filename, image.P, image.width, image.height, colorize);
-            printf("\rRendering frame %d/%d (%d)", frame + 1, num_frames, limit);
+
+            if (!silent) {
+                printf("\rRendering frame %d/%d (%d)", frame + 1, num_frames, limit);
+            }
         }
     }
     else {

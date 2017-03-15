@@ -18,6 +18,7 @@ typedef struct arg_options_render {
     int colorize;
     int movie;
     int num_frames;
+    int silent;
 } arg_options_render;
 
 typedef struct arg_options {

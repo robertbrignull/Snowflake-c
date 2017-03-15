@@ -39,7 +39,8 @@ void print_usage(int exit_code) {
     printf("                          Default is just the final frame\n");
     printf("                          If this is used then the output filename should be\n");
     printf("                            provided as a format string, e.g. out/output_%%d.png\n");
-    printf("    -f --frames           The number of frames to produce if making a movie\n\n");
+    printf("    -f --frames           The number of frames to produce if making a movie\n");
+    printf("    -s --silent           Don't output progress\n\n");
 
     printf("Mode bsp_test\n");
     printf("  runs tests on the BSP implementation.\n\n");
@@ -160,6 +161,7 @@ arg_options *parse_args(int argc, char **argv) {
         args->render.movie = 0;
         args->render.num_frames = 0;
         int num_frames_set = 0;
+        args->render.silent = 0;
 
         int argi = 2;
         while (argi < argc) {
@@ -194,6 +196,10 @@ arg_options *parse_args(int argc, char **argv) {
                 args->render.num_frames = atoi(argv[argi+1]);
                 num_frames_set = 1;
                 argi += 2;
+            }
+            else if (arg_matches(argv[argi], "--silent", "-s")) {
+                args->render.silent = 1;
+                argi += 1;
             }
             else {
                 print_unrecognised_argument(argv[argi]);
