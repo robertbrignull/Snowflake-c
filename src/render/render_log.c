@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <fcntl.h>
+#include <zconf.h>
 
 #include "algo.h"
 #include "render/write_png.h"
@@ -109,15 +111,27 @@ void render_log(FILE *log, char *filename, int colorize, int movie, int num_fram
         return;
     }
 
+    printf("Press enter to stop...\n");
+
     image_def image = create_image_array(points, num_particles, colorize);
 
     if (movie) {
+        // Set up stdin for non-blocking IO
+        int flags = fcntl(STDIN_FILENO, F_GETFL, 0);
+        fcntl(STDIN_FILENO, F_SETFL, flags | O_NONBLOCK);
+
         char *frame_filename = (char*) malloc(strlen(filename) + 100);
         for (int frame = 0; frame < num_frames; frame++) {
+            // Check if we should stop
+            if (getc(stdin) != -1) {
+                break;
+            }
+
             int limit = (int) (1.0 * num_particles * frame / num_frames);
             sprintf(frame_filename, filename, limit);
             generate_image(points, image, colorize, limit);
             write_png(frame_filename, image.P, image.width, image.height, colorize);
+            printf("\rRendering frame %d/%d (%d)", frame + 1, num_frames, limit);
         }
     }
     else {
