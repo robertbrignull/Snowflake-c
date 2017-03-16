@@ -57,8 +57,8 @@ bsp_t *bsp_change_size(bsp_t *b, double new_size) {
         bsp_node node = b->nodes[i];
         if (node.type == BSP_BUCKET) {
             bsp_bucket *bucket = &(b->buckets[node.bucket]);
-            for (int i = 0; i < bucket->size; i++) {
-                bsp_add_point(new_b, bucket->points[i].x, bucket->points[i].y);
+            for (int j = 0; j < bucket->size; j++) {
+                bsp_add_point(new_b, bucket->points[j].x, bucket->points[j].y);
             }
         }
     }
