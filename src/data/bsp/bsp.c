@@ -120,7 +120,8 @@ int bsp_new_empty_node(bsp_t *b) {
 
 void bsp_add_to_bucket_node(bsp_t *b, int node_index, double node_x, double node_y, double node_size) {
     bsp_node node = b->nodes[node_index];
-    bsp_bucket *bucket = &(b->buckets[node.bucket]);
+    int old_bucket = node.bucket;
+    bsp_bucket *bucket = &(b->buckets[old_bucket]);
 
     if (bucket->size != BSP_BUCKET_SIZE) {
         bucket->points[bucket->size].x = point_x;
@@ -138,6 +139,11 @@ void bsp_add_to_bucket_node(bsp_t *b, int node_index, double node_x, double node
         node.NW = bsp_new_empty_node(b);
         node.NE = bsp_new_empty_node(b);
         b->nodes[node_index] = node;
+
+        // We can reuse the old bucket
+        b->buckets[old_bucket].size = 0;
+        b->nodes[node.NE].bucket = old_bucket;
+        b->num_buckets--;
 
         bsp_add_point_impl(b, node_index, node_x, node_y, node_size);
 
