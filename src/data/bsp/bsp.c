@@ -9,12 +9,9 @@
 
 // Declare private functions
 int bsp_new_empty_node(bsp_t *b, double node_x, double node_y, double node_size);
-void bsp_add_point_impl(bsp_t *b, int node_index);
-bsp_result bsp_find_nearest_impl(bsp_t *b, int node_index);
+void bsp_add_point_impl(bsp_t *b, int node_index, double point_x, double point_y);
+bsp_result bsp_find_nearest_impl(bsp_t *b, int node_index, double point_x, double point_y);
 void bsp_print_impl(bsp_t *b, int node_index);
-
-// global constants-ish used by bsp_add_point_impl and bsp_find_nearest_impl
-double point_x, point_y;
 
 
 
@@ -78,16 +75,12 @@ void bsp_add_point(bsp_t *b, double x, double y) {
         return;
     }
 
-    point_x = x;
-    point_y = y;
-    bsp_add_point_impl(b, 0);
+    bsp_add_point_impl(b, 0, x, y);
 }
 
 // Returns the distance to the nearest point in the tree
 bsp_result bsp_find_nearest(bsp_t *b, double x, double y) {
-    point_x = x;
-    point_y = y;
-    return bsp_find_nearest_impl(b, 0);
+    return bsp_find_nearest_impl(b, 0, x, y);
 }
 
 // For testing, prints a tree
@@ -124,7 +117,7 @@ int bsp_new_empty_node(bsp_t *b, double node_x, double node_y, double node_size)
     return i;
 }
 
-void bsp_add_to_bucket_node(bsp_t *b, int node_index) {
+void bsp_add_to_bucket_node(bsp_t *b, int node_index, double point_x, double point_y) {
     bsp_node node = b->nodes[node_index];
     int old_bucket = node.bucket;
     bsp_bucket *bucket = &(b->buckets[old_bucket]);
@@ -151,18 +144,18 @@ void bsp_add_to_bucket_node(bsp_t *b, int node_index) {
         b->nodes[node.children[NE]].bucket = old_bucket;
         b->num_buckets--;
 
-        bsp_add_point_impl(b, node_index);
+        bsp_add_point_impl(b, node_index, point_x, point_y);
 
         for (int i = 0; i < num_old_points; i++) {
             point_x = old_points[i].x;
             point_y = old_points[i].y;
-            bsp_add_point_impl(b, node_index);
+            bsp_add_point_impl(b, node_index, point_x, point_y);
         }
     }
 }
 
 // Private method, adds a point to the tree
-void bsp_add_point_impl(bsp_t *b, int node_index) {
+void bsp_add_point_impl(bsp_t *b, int node_index, double point_x, double point_y) {
     bsp_node node = b->nodes[node_index];
 
     while (node.type == BSP_CROSS) {
@@ -185,14 +178,14 @@ void bsp_add_point_impl(bsp_t *b, int node_index) {
         node = b->nodes[node_index];
     }
 
-    bsp_add_to_bucket_node(b, node_index);
+    bsp_add_to_bucket_node(b, node_index, point_x, point_y);
 }
 
 bsp_result min_bsp_result(bsp_result r1, bsp_result r2) {
     return (r1.d == -1.0 || (r2.d != -1.0 && r2.d < r1.d)) ? r2 : r1;
 }
 
-bsp_result bsp_find_nearest_impl(bsp_t *b, int node_index) {
+bsp_result bsp_find_nearest_impl(bsp_t *b, int node_index, double point_x, double point_y) {
     bsp_node node = b->nodes[node_index];
 
     if (node.type == BSP_CROSS) {
@@ -232,41 +225,41 @@ bsp_result bsp_find_nearest_impl(bsp_t *b, int node_index) {
             F = node.children[SW];
         }
 
-        bsp_result r = bsp_find_nearest_impl(b, N);
+        bsp_result r = bsp_find_nearest_impl(b, N, point_x, point_y);
 
         if (r.d != -1.0 && r.d <= adx && r.d <= ady) {
             return r;
         }
 
         if (adx < ady) {
-            r = min_bsp_result(r, bsp_find_nearest_impl(b, H));
+            r = min_bsp_result(r, bsp_find_nearest_impl(b, H, point_x, point_y));
 
             if (r.d != -1.0 && r.d <= ady) {
                 return r;
             }
 
-            r = min_bsp_result(r, bsp_find_nearest_impl(b, V));
+            r = min_bsp_result(r, bsp_find_nearest_impl(b, V, point_x, point_y));
 
             if (r.d != -1.0 && r.d <= dist_origin(dx, dy)) {
                 return r;
             }
 
-            return min_bsp_result(r, bsp_find_nearest_impl(b, F));
+            return min_bsp_result(r, bsp_find_nearest_impl(b, F, point_x, point_y));
         }
         else {
-            r = min_bsp_result(r, bsp_find_nearest_impl(b, V));
+            r = min_bsp_result(r, bsp_find_nearest_impl(b, V, point_x, point_y));
 
             if (r.d != -1.0 && r.d <= adx) {
                 return r;
             }
 
-            r = min_bsp_result(r, bsp_find_nearest_impl(b, H));
+            r = min_bsp_result(r, bsp_find_nearest_impl(b, H, point_x, point_y));
 
             if (r.d != -1.0 && r.d <= dist_origin(dx, dy)) {
                 return r;
             }
 
-            return min_bsp_result(r, bsp_find_nearest_impl(b, F));
+            return min_bsp_result(r, bsp_find_nearest_impl(b, F, point_x, point_y));
         }
     }
     else if (node.type == BSP_BUCKET) {
