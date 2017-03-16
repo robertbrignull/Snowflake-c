@@ -12,12 +12,12 @@
 #include "render/render_log.h"
 
 typedef struct image_def {
-    unsigned char *P;      // the pixels array
-    size_t P_size;   // the length of the pixels array
-    int width;    // the width of the image
-    int height;   // the height of the image
-    int left;     // the left offset of the image in the coordinate space
-    int top;      // the top offset of the image in the coordinate space
+    unsigned char *P;  // the pixels array
+    size_t P_size;     // the length of the pixels array
+    int width;         // the width of the image
+    int height;        // the height of the image
+    int left;          // the left offset of the image in the coordinate space
+    int top;           // the top offset of the image in the coordinate space
 } image_def;
 
 image_def create_image_array(double *points, int num_particles, int colorize) {
