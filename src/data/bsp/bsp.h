@@ -30,6 +30,8 @@ typedef struct bsp_node {
             int SW, NW, SE, NE;
         };
     };
+
+    double node_x, node_y, node_size;
 } bsp_node;
 
 typedef struct bsp_t {
