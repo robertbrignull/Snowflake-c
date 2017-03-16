@@ -11,7 +11,6 @@
 int bsp_new_empty_node(bsp_t *b, double node_x, double node_y, double node_size);
 void bsp_add_point_impl(bsp_t *b, int node_index, double point_x, double point_y);
 bsp_result bsp_find_nearest_impl(bsp_t *b, int node_index, double point_x, double point_y);
-void bsp_print_impl(bsp_t *b, int node_index);
 
 
 
@@ -81,11 +80,6 @@ void bsp_add_point(bsp_t *b, double x, double y) {
 // Returns the distance to the nearest point in the tree
 bsp_result bsp_find_nearest(bsp_t *b, double x, double y) {
     return bsp_find_nearest_impl(b, 0, x, y);
-}
-
-// For testing, prints a tree
-void bsp_print(bsp_t *b) {
-    bsp_print_impl(b, 0);
 }
 
 
@@ -288,34 +282,3 @@ bsp_result bsp_find_nearest_impl(bsp_t *b, int node_index, double point_x, doubl
     }
 }
 
-void bsp_print_impl(bsp_t *b, int node_index) {
-    bsp_node node = b->nodes[node_index];
-
-    if (node.type == BSP_CROSS) {
-        printf("Cross(%d, (%.1f, %.1f, %.1f), ", node_index, node.node_x, node.node_y, node.node_size);
-        
-        bsp_print_impl(b, node.children[SW]);
-        printf(", ");
-        
-        bsp_print_impl(b, node.children[SE]);
-        printf(", ");
-        
-        bsp_print_impl(b, node.children[NW]);
-        printf(", ");
-
-        bsp_print_impl(b, node.children[NE]);
-        printf(")");
-    }
-    else if (node.type == BSP_BUCKET) {
-        printf("Bucket(%d, (%.1f, %.1f, %.1f), [", node_index, node.node_x, node.node_y, node.node_size);
-        bsp_bucket *bucket = &(b->buckets[node.bucket]);
-        for (int i = 0; i < bucket->size; i++) {
-            if (i != 0) printf(", ");
-            printf("(%.1f, %.1f)", bucket->points[i].x, bucket->points[i].y);
-        }
-        printf("])");
-    }
-    else {
-        printf("Empty(%d, (%.1f, %.1f, %.1f))", node_index, node.node_x, node.node_y, node.node_size);
-    }
-}
