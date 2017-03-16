@@ -140,15 +140,15 @@ void bsp_add_to_bucket_node(bsp_t *b, int node_index) {
         int num_old_points = bucket->size;
 
         node.type = BSP_CROSS;
-        node.SW = bsp_new_empty_node(b, node.node_x, node.node_y, node.node_size / 2);
-        node.SE = bsp_new_empty_node(b, node.node_x + node.node_size / 2, node.node_y, node.node_size / 2);
-        node.NW = bsp_new_empty_node(b, node.node_x, node.node_y + node.node_size / 2, node.node_size / 2);
-        node.NE = bsp_new_empty_node(b, node.node_x + node.node_size / 2, node.node_y + node.node_size / 2, node.node_size / 2);
+        node.children[SW] = bsp_new_empty_node(b, node.node_x, node.node_y, node.node_size / 2);
+        node.children[SE] = bsp_new_empty_node(b, node.node_x + node.node_size / 2, node.node_y, node.node_size / 2);
+        node.children[NW] = bsp_new_empty_node(b, node.node_x, node.node_y + node.node_size / 2, node.node_size / 2);
+        node.children[NE] = bsp_new_empty_node(b, node.node_x + node.node_size / 2, node.node_y + node.node_size / 2, node.node_size / 2);
         b->nodes[node_index] = node;
 
         // We can reuse the old bucket
         b->buckets[old_bucket].size = 0;
-        b->nodes[node.NE].bucket = old_bucket;
+        b->nodes[node.children[NE]].bucket = old_bucket;
         b->num_buckets--;
 
         bsp_add_point_impl(b, node_index);
@@ -170,16 +170,16 @@ void bsp_add_point_impl(bsp_t *b, int node_index) {
         int west = point_x < node.node_x + node.node_size / 2;
 
         if (south && west) {
-            node_index = node.SW;
+            node_index = node.children[SW];
         }
         else if (south) {
-            node_index = node.SE;
+            node_index = node.children[SE];
         }
         else if (west) {
-            node_index = node.NW;
+            node_index = node.children[NW];
         }
         else {
-            node_index = node.NE;
+            node_index = node.children[NE];
         }
 
         node = b->nodes[node_index];
@@ -208,28 +208,28 @@ bsp_result bsp_find_nearest_impl(bsp_t *b, int node_index) {
         int N, H, V, F;
 
         if (dx < 0 && dy < 0) {
-            N = node.SW;
-            H = node.SE;
-            V = node.NW;
-            F = node.NE;
+            N = node.children[SW];
+            H = node.children[SE];
+            V = node.children[NW];
+            F = node.children[NE];
         }
         else if (dx >= 0 && dy < 0) {
-            N = node.SE;
-            H = node.SW;
-            V = node.NE;
-            F = node.NW;
+            N = node.children[SE];
+            H = node.children[SW];
+            V = node.children[NE];
+            F = node.children[NW];
         }
         else if (dx < 0 && dy >= 0) {
-            N = node.NW;
-            H = node.NE;
-            V = node.SW;
-            F = node.SE;
+            N = node.children[NW];
+            H = node.children[NE];
+            V = node.children[SW];
+            F = node.children[SE];
         }
         else { // dx >= 0 && dy >= 0
-            N = node.NE;
-            H = node.NW;
-            V = node.SE;
-            F = node.SW;
+            N = node.children[NE];
+            H = node.children[NW];
+            V = node.children[SE];
+            F = node.children[SW];
         }
 
         bsp_result r = bsp_find_nearest_impl(b, N);
@@ -301,16 +301,16 @@ void bsp_print_impl(bsp_t *b, int node_index) {
     if (node.type == BSP_CROSS) {
         printf("Cross(%d, (%.1f, %.1f, %.1f), ", node_index, node.node_x, node.node_y, node.node_size);
         
-        bsp_print_impl(b, node.SW);
+        bsp_print_impl(b, node.children[SW]);
         printf(", ");
         
-        bsp_print_impl(b, node.SE);
+        bsp_print_impl(b, node.children[SE]);
         printf(", ");
         
-        bsp_print_impl(b, node.NW);
+        bsp_print_impl(b, node.children[NW]);
         printf(", ");
 
-        bsp_print_impl(b, node.NE);
+        bsp_print_impl(b, node.children[NE]);
         printf(")");
     }
     else if (node.type == BSP_BUCKET) {

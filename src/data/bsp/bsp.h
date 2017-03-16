@@ -2,6 +2,8 @@
 
 typedef enum bsp_type_e {BSP_CROSS, BSP_BUCKET} bsp_type_e;
 
+typedef enum bsp_dir_e {SW = 0, NW = 1, SE = 2, NE = 3} bsp_dir_e;
+
 typedef struct bsp_point {
     double x, y;
 } bsp_point;
@@ -27,7 +29,7 @@ typedef struct bsp_node {
         // If this node is a cross then this contains
         // the indexes of its children
         struct {
-            int SW, NW, SE, NE;
+            int children[4];
         };
     };
 
