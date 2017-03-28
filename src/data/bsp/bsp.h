@@ -84,6 +84,3 @@ void bsp_add_point(bsp_t *b, double x, double y);
 
 // Returns the distance to the nearest point in the tree
 bsp_result bsp_find_nearest(bsp_t *b, double x, double y);
-
-// For testing, prints a bsp tree
-void bsp_print(bsp_t *b);
