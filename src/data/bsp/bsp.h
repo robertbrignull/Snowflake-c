@@ -18,20 +18,11 @@ typedef struct bsp_bucket {
 } bsp_bucket;
 
 typedef struct bsp_node {
-    // The type of this node, determines how to use the union below
-    bsp_type_e type;
+    // Whether the child is another node or a bucket
+    bsp_type_e child_types[4];
 
-    union {
-        // If this node is a bucket then this contains
-        // the index in to the buckets array
-        int bucket;
-
-        // If this node is a cross then this contains
-        // the indexes of its children
-        struct {
-            int children[4];
-        };
-    };
+    // The index of the child, either in to the nodes or the buckets arrays
+    int children[4];
 
     double node_x, node_y, node_size;
 } bsp_node;

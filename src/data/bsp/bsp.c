@@ -8,7 +8,6 @@
 #include "data/bsp/bsp.h"
 
 // Declare private functions
-int bsp_new_empty_node(bsp_t *b, double node_x, double node_y, double node_size);
 void bsp_add_point_impl(bsp_t *b, int node_index, double point_x, double point_y);
 bsp_result bsp_find_nearest_impl(bsp_t *b, int node_index, double point_x, double point_y);
 
@@ -28,14 +27,18 @@ bsp_t *bsp_new(double S) {
     b->buckets = (bsp_bucket*) malloc(sizeof(bsp_bucket) * b->buckets_size);
     CHECK_MEM(b->buckets);
 
-    b->nodes[0].type = BSP_BUCKET;
-    b->nodes[0].bucket = 0;
-    b->buckets[0].size = 0;
+    for (int i = 0; i < 4; i++) {
+        b->nodes[0].child_types[i] = BSP_BUCKET;
+        b->nodes[0].children[i] = i;
+        b->buckets[i].size = 0;
+    }
+
     b->nodes[0].node_x = - S;
     b->nodes[0].node_y = - S;
     b->nodes[0].node_size = S * 2;
+
     b->num_nodes = 1;
-    b->num_buckets = 1;
+    b->num_buckets = 4;
 
     return b;
 }
@@ -52,13 +55,9 @@ void bsp_destroy(bsp_t *b) {
 bsp_t *bsp_change_size(bsp_t *b, double new_size) {
     bsp_t *new_b = bsp_new(new_size);
 
-    for (int i = 0; i < b->num_nodes; i++) {
-        bsp_node node = b->nodes[i];
-        if (node.type == BSP_BUCKET) {
-            bsp_bucket *bucket = &(b->buckets[node.bucket]);
-            for (int j = 0; j < bucket->size; j++) {
-                bsp_add_point(new_b, bucket->points[j].x, bucket->points[j].y);
-            }
+    for (int i = 0; i < b->num_buckets; i++) {
+        for (int j = 0; j < b->buckets[i].size; j++) {
+            bsp_add_point(new_b, b->buckets[i].points[j].x, b->buckets[i].points[j].y);
         }
     }
 
@@ -84,37 +83,10 @@ bsp_result bsp_find_nearest(bsp_t *b, double x, double y) {
 
 
 
-// Private method, creates a new bsp tree node
-int bsp_new_empty_node(bsp_t *b, double node_x, double node_y, double node_size) {
-    if (b->num_nodes == b->nodes_size) {
-        b->nodes_size *= 2;
-        b->nodes = (bsp_node*) realloc(b->nodes, sizeof(bsp_node) * b->nodes_size);
-        CHECK_MEM(b->nodes);
-    }
-
-    if (b->num_buckets == b->buckets_size) {
-        b->buckets_size *= 2;
-        b->buckets = (bsp_bucket*) realloc(b->buckets, sizeof(bsp_bucket) * b->buckets_size);
-        CHECK_MEM(b->buckets);
-    }
-
-    int i = b->num_nodes;
-    b->nodes[i].type = BSP_BUCKET;
-    b->nodes[i].bucket = b->num_buckets;
-    b->buckets[b->num_buckets].size = 0;
-    b->nodes[i].node_x = node_x;
-    b->nodes[i].node_y = node_y;
-    b->nodes[i].node_size = node_size;
-    b->num_nodes++;
-    b->num_buckets++;
-
-    return i;
-}
-
-void bsp_add_to_bucket_node(bsp_t *b, int node_index, double point_x, double point_y) {
+void bsp_add_to_bucket_node(bsp_t *b, int node_index, bsp_dir_e child, double point_x, double point_y) {
     bsp_node node = b->nodes[node_index];
-    int old_bucket = node.bucket;
-    bsp_bucket *bucket = &(b->buckets[old_bucket]);
+    int old_bucket_index = node.children[child];
+    bsp_bucket *bucket = &(b->buckets[old_bucket_index]);
 
     if (bucket->size != BSP_BUCKET_SIZE) {
         bucket->points[bucket->size].x = point_x;
@@ -126,140 +98,128 @@ void bsp_add_to_bucket_node(bsp_t *b, int node_index, double point_x, double poi
         memcpy(old_points, bucket->points, sizeof(bsp_point) * BSP_BUCKET_SIZE);
         int num_old_points = bucket->size;
 
-        node.type = BSP_CROSS;
-        node.children[SW] = bsp_new_empty_node(b, node.node_x, node.node_y, node.node_size / 2);
-        node.children[SE] = bsp_new_empty_node(b, node.node_x + node.node_size / 2, node.node_y, node.node_size / 2);
-        node.children[NW] = bsp_new_empty_node(b, node.node_x, node.node_y + node.node_size / 2, node.node_size / 2);
-        node.children[NE] = bsp_new_empty_node(b, node.node_x + node.node_size / 2, node.node_y + node.node_size / 2, node.node_size / 2);
+        // Ensure space for one more node
+        if (b->num_nodes == b->nodes_size) {
+            b->nodes_size *= 2;
+            b->nodes = (bsp_node*) realloc(b->nodes, sizeof(bsp_node) * b->nodes_size);
+            CHECK_MEM(b->nodes);
+        }
+
+        // Ensure space for three more buckets (we can reuse the old one)
+        if (b->num_buckets + 4 > b->buckets_size) {
+            b->buckets_size *= 2;
+            b->buckets = (bsp_bucket*) realloc(b->buckets, sizeof(bsp_bucket) * b->buckets_size);
+            CHECK_MEM(b->buckets);
+        }
+
+        int child_index = b->num_nodes;
+
+        node.child_types[child] = BSP_CROSS;
+        node.children[child] = child_index;
+
+        bsp_node new_node;
+        new_node.node_size = node.node_size / 2;
+        switch (child) {
+            case SW:
+                new_node.node_x = node.node_x;
+                new_node.node_y = node.node_y;
+                break;
+            case SE:
+                new_node.node_x = node.node_x + new_node.node_size;
+                new_node.node_y = node.node_y;
+                break;
+            case NW:
+                new_node.node_x = node.node_x;
+                new_node.node_y = node.node_y + new_node.node_size;
+                break;
+            case NE:
+                new_node.node_x = node.node_x + new_node.node_size;
+                new_node.node_y = node.node_y + new_node.node_size;
+        }
+        // Create three new nodes
+        for (int i = 0; i < 3; i++) {
+            new_node.child_types[i] = BSP_BUCKET;
+            new_node.children[i] = b->num_buckets + i;
+            b->buckets[b->num_buckets + i].size = 0;
+        }
+        // And reuse the old bucket
+        new_node.child_types[3] = BSP_BUCKET;
+        new_node.children[3] = old_bucket_index;
+        b->buckets[old_bucket_index].size = 0;
+
         b->nodes[node_index] = node;
+        b->nodes[child_index] = new_node;
 
-        // We can reuse the old bucket
-        b->buckets[old_bucket].size = 0;
-        b->nodes[node.children[NE]].bucket = old_bucket;
-        b->num_buckets--;
+        b->num_nodes++;
+        b->num_buckets += 3;
 
-        bsp_add_point_impl(b, node_index, point_x, point_y);
+        bsp_add_point_impl(b, child_index, point_x, point_y);
 
         for (int i = 0; i < num_old_points; i++) {
             point_x = old_points[i].x;
             point_y = old_points[i].y;
-            bsp_add_point_impl(b, node_index, point_x, point_y);
+            bsp_add_point_impl(b, child_index, point_x, point_y);
         }
     }
 }
 
 // Private method, adds a point to the tree
 void bsp_add_point_impl(bsp_t *b, int node_index, double point_x, double point_y) {
-    bsp_node node = b->nodes[node_index];
+    bsp_node node;
+    bsp_dir_e child;
 
-    while (node.type == BSP_CROSS) {
+    // Repeatedly find the quadrant the point belongs in until we reach a bucket
+    while (1) {
+        node = b->nodes[node_index];
+
         int south = point_y < node.node_y + node.node_size / 2;
         int west = point_x < node.node_x + node.node_size / 2;
 
         if (south && west) {
-            node_index = node.children[SW];
+            child = SW;
         }
         else if (south) {
-            node_index = node.children[SE];
+            child = SE;
         }
         else if (west) {
-            node_index = node.children[NW];
+            child = NW;
         }
         else {
-            node_index = node.children[NE];
+            child = NE;
         }
 
-        node = b->nodes[node_index];
+        if (node.child_types[child] == BSP_CROSS) {
+            node_index = node.children[child];
+        }
+        else {
+            break;
+        }
     }
 
-    bsp_add_to_bucket_node(b, node_index, point_x, point_y);
+    bsp_add_to_bucket_node(b, node_index, child, point_x, point_y);
 }
 
 bsp_result min_bsp_result(bsp_result r1, bsp_result r2) {
     return (r1.d == -1.0 || (r2.d != -1.0 && r2.d < r1.d)) ? r2 : r1;
 }
 
-bsp_result bsp_find_nearest_impl(bsp_t *b, int node_index, double point_x, double point_y) {
+bsp_result bsp_find_nearest_for_child(bsp_t *b, int node_index, bsp_dir_e child, double point_x, double point_y) {
     bsp_node node = b->nodes[node_index];
 
-    if (node.type == BSP_CROSS) {
-        double dx = point_x - node.node_x - node.node_size / 2;
-        double dy = point_y - node.node_y - node.node_size / 2;
-        double adx = fabs(dx);
-        double ady = fabs(dy);
+    if (node.child_types[child] == BSP_CROSS) {
+        return bsp_find_nearest_impl(b, node.children[child], point_x, point_y);
+    }
+    else {
+        bsp_bucket *bucket = &(b->buckets[node.children[child]]);
 
-        //   N = near quadrant (the one the point is in)
-        //   H = the adjacent quadrant horizontally
-        //   V = the adjacent quadrant vertically
-        //   F = the far quadrant that is not adjacent
-        int N, H, V, F;
+        bsp_result r;
 
-        if (dx < 0 && dy < 0) {
-            N = node.children[SW];
-            H = node.children[SE];
-            V = node.children[NW];
-            F = node.children[NE];
-        }
-        else if (dx >= 0 && dy < 0) {
-            N = node.children[SE];
-            H = node.children[SW];
-            V = node.children[NE];
-            F = node.children[NW];
-        }
-        else if (dx < 0 && dy >= 0) {
-            N = node.children[NW];
-            H = node.children[NE];
-            V = node.children[SW];
-            F = node.children[SE];
-        }
-        else { // dx >= 0 && dy >= 0
-            N = node.children[NE];
-            H = node.children[NW];
-            V = node.children[SE];
-            F = node.children[SW];
-        }
-
-        bsp_result r = bsp_find_nearest_impl(b, N, point_x, point_y);
-
-        if (r.d != -1.0 && r.d <= adx && r.d <= ady) {
+        if (bucket->size == 0) {
+            r.x = r.y = 0.0;
+            r.d = -1.0;
             return r;
         }
 
-        if (adx < ady) {
-            r = min_bsp_result(r, bsp_find_nearest_impl(b, H, point_x, point_y));
-
-            if (r.d != -1.0 && r.d <= ady) {
-                return r;
-            }
-
-            r = min_bsp_result(r, bsp_find_nearest_impl(b, V, point_x, point_y));
-
-            if (r.d != -1.0 && r.d <= dist_origin(dx, dy)) {
-                return r;
-            }
-
-            return min_bsp_result(r, bsp_find_nearest_impl(b, F, point_x, point_y));
-        }
-        else {
-            r = min_bsp_result(r, bsp_find_nearest_impl(b, V, point_x, point_y));
-
-            if (r.d != -1.0 && r.d <= adx) {
-                return r;
-            }
-
-            r = min_bsp_result(r, bsp_find_nearest_impl(b, H, point_x, point_y));
-
-            if (r.d != -1.0 && r.d <= dist_origin(dx, dy)) {
-                return r;
-            }
-
-            return min_bsp_result(r, bsp_find_nearest_impl(b, F, point_x, point_y));
-        }
-    }
-    else if (node.type == BSP_BUCKET) {
-        bsp_bucket *bucket = &(b->buckets[node.bucket]);
-
-        bsp_result r;
         r.x = bucket->points[0].x;
         r.y = bucket->points[0].y;
         r.d = dist(point_x, point_y, bucket->points[0].x, bucket->points[0].y);
@@ -274,11 +234,70 @@ bsp_result bsp_find_nearest_impl(bsp_t *b, int node_index, double point_x, doubl
 
         return r;
     }
-    else {
-        bsp_result r;
-        r.x = r.y = 0.0;
-        r.d = -1.0;
+}
+
+bsp_result bsp_find_nearest_impl(bsp_t *b, int node_index, double point_x, double point_y) {
+    bsp_node node = b->nodes[node_index];
+
+    double dx = point_x - node.node_x - node.node_size / 2;
+    double dy = point_y - node.node_y - node.node_size / 2;
+    double adx = fabs(dx);
+    double ady = fabs(dy);
+
+    // N = near quadrant (the one the point is in)
+    // H = the adjacent quadrant horizontally
+    // V = the adjacent quadrant vertically
+    // F = the far quadrant that is not adjacent
+    bsp_dir_e N, H, V, F;
+
+    if (dx < 0 && dy < 0) {
+        N = SW; H = SE; V = NW; F = NE;
+    }
+    else if (dx >= 0 && dy < 0) {
+        N = SE; H = SW; V = NE; F = NW;
+    }
+    else if (dx < 0 && dy >= 0) {
+        N = NW; H = NE; V = SW; F = SE;
+    }
+    else { // dx >= 0 && dy >= 0
+        N = NE; H = NW; V = SE; F = SW;
+    }
+
+    bsp_result r = bsp_find_nearest_for_child(b, node_index, N, point_x, point_y);
+
+    if (r.d != -1.0 && r.d <= adx && r.d <= ady) {
         return r;
+    }
+
+    if (adx < ady) {
+        r = min_bsp_result(r, bsp_find_nearest_for_child(b, node_index, H, point_x, point_y));
+
+        if (r.d != -1.0 && r.d <= ady) {
+            return r;
+        }
+
+        r = min_bsp_result(r, bsp_find_nearest_for_child(b, node_index, V, point_x, point_y));
+
+        if (r.d != -1.0 && r.d <= dist_origin(dx, dy)) {
+            return r;
+        }
+
+        return min_bsp_result(r, bsp_find_nearest_for_child(b, node_index, F, point_x, point_y));
+    }
+    else {
+        r = min_bsp_result(r, bsp_find_nearest_for_child(b, node_index, V, point_x, point_y));
+
+        if (r.d != -1.0 && r.d <= adx) {
+            return r;
+        }
+
+        r = min_bsp_result(r, bsp_find_nearest_for_child(b, node_index, H, point_x, point_y));
+
+        if (r.d != -1.0 && r.d <= dist_origin(dx, dy)) {
+            return r;
+        }
+
+        return min_bsp_result(r, bsp_find_nearest_for_child(b, node_index, F, point_x, point_y));
     }
 }
 
