@@ -11,8 +11,10 @@ The output format is always png because it is lossless and offers excellent comp
 
 ### Use
 
-Compile by doing `cd build; cmake ..; make`
+Compile by running from the root of the project `cmake .; make`.
 
-Then from the base directory run `build/snowflake` for more instructions on how to use the program.
+Then run `./snowflake --help` for more instructions on how to use the program.
 
-To combine multiple images into a movie, use `ffmpeg -framerate 60 -pattern_type glob -i '*.png' -c:v libx264rgb -pix_fmt bgr24 out.mp4`
+For example, run `./snowflake gen -n 300000 -d 6 -t full -o output.flake` to generate a flake and then `./snowflake render -i output.flake -o output.png` to render it to an image.
+
+To render a series of snapshots of the flake use `./snowflake render -i output.flake -o output_%06d.png -m -f 300`. To then combine the multiple images into a movie, use something like `ffmpeg -framerate 30 -pattern_type glob -i '*.png' -c:v libx264rgb -pix_fmt bgr24 out.mp4`.
