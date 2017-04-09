@@ -111,7 +111,7 @@ void render_log(FILE *log, char *filename, int colorize, int movie, int num_fram
         return;
     }
 
-    if (!silent) {
+    if (movie && !silent) {
         printf("Press enter to stop...\n");
     }
 
