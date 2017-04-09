@@ -30,9 +30,10 @@ void print_usage(int exit_code) {
     printf("Mode render\n");
     printf("  render a snowflake from a previous run.\n\n");
     printf("  Required argumens:\n");
-    printf("    -i --input            Input filename of snowflake data\n");
-    printf("    -o --output           Output filename for image\n\n");
+    printf("    -i --input            Input filename of snowflake data\n\n");
     printf("  Optional argumens:\n");
+    printf("    -o --output           Output filename for image\n");
+    printf("                          Default is to add a .png extension to the input file\n");
     printf("    -c --colorize         Show pixel age through color\n");
     printf("                          Default is no color\n");
     printf("    -m --movie            Output all states as images instead of just the final flake\n");
@@ -70,6 +71,30 @@ void check_enough_parameters(char *arg, int argc, int argi, int num_params_expec
 int arg_matches(char *actual_arg, char *long_arg, char *short_arg) {
     return ((long_arg != 0 && strcmp(long_arg, actual_arg) == 0) ||
             (short_arg != 0 && strcmp(short_arg, actual_arg) == 0));
+}
+
+char *replace_extension(char *original_str, char *new_extension) {
+    size_t original_length = strlen(original_str);
+
+    size_t extension_start = original_length;
+    for (size_t i = 0; i < original_length; i++) {
+        if (original_str[original_length - i] == '.') {
+            extension_start = original_length - i;
+            break;
+        }
+    }
+
+    size_t extension_length = strlen(new_extension);
+    size_t new_length = extension_start + extension_length + 2;
+    char *new_str = malloc(new_length);
+    CHECK_MEM(new_str);
+
+    strncpy(new_str, original_str, extension_start);
+    new_str[extension_start] = '.';
+    strncpy(new_str + extension_start + 1, new_extension, extension_length);
+    new_str[extension_start + extension_length + 1] = 0;
+
+    return new_str;
 }
 
 arg_options *parse_args(int argc, char **argv) {
@@ -151,12 +176,12 @@ arg_options *parse_args(int argc, char **argv) {
         args->mode = RENDER;
 
         // required args
-        args->render.output = 0;
-        int output_set = 0;
         args->render.input = 0;
         int input_set = 0;
 
         // optional args
+        args->render.output = 0;
+        int output_set = 0;
         args->render.colorize = 0;
         args->render.movie = 0;
         args->render.num_frames = 0;
@@ -206,12 +231,12 @@ arg_options *parse_args(int argc, char **argv) {
             }
         }
 
-        if (!output_set) {
-            print_missing_argument("--output");
-        }
-
         if (!input_set) {
             print_missing_argument("--input");
+        }
+
+        if (!output_set) {
+            args->render.output = replace_extension(args->render.input, "png");
         }
 
         if (args->render.movie && !num_frames_set) {
