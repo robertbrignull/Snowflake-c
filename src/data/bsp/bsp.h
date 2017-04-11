@@ -61,17 +61,17 @@ typedef struct bsp_result {
 
 
 // Creates an empty bsp tree with the given size
-bsp_t *bsp_new(double S);
+bsp_t *new_flake(double S);
 
 // Destroys the tree, freeing memory
-void bsp_destroy(bsp_t *b);
+void destroy_flake(bsp_t *b);
 
 // A convenience method to create a new bsp of the given
 // size, copy across all points, and destroy the old bsp.
-bsp_t *bsp_change_size(bsp_t *b, double new_size);
+bsp_t *change_flake_size(bsp_t *b, double new_size);
 
 // Adds a point to the tree
-void bsp_add_point(bsp_t *b, double x, double y);
+void add_point_to_flake(bsp_t *b, double x, double y);
 
 // Returns the distance to the nearest point in the tree
-bsp_result bsp_find_nearest(bsp_t *b, double x, double y);
+bsp_result find_nearest_in_flake(bsp_t *b, double x, double y);

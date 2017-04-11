@@ -12,7 +12,7 @@
 
 void add_point(bsp_t *b, FILE *log, double x, double y) {
     // add the new point
-    bsp_add_point(b, x, y);
+    add_point_to_flake(b, x, y);
 
     // log the addition of this point
     log_new_particle(log, x, y);
@@ -21,7 +21,7 @@ void add_point(bsp_t *b, FILE *log, double x, double y) {
 void create_snowflake(int N, FILE *log, int symmetry_degree, symmetry_type_enum symmetry_type, int silent) {
     int num_particles = 0;
     double farthest_particle = 0.0;
-    bsp_t *b = read_flake_log_as_bsp(log, &num_particles, &farthest_particle);
+    bsp_t *b = read_log_as_flake(log, &num_particles, &farthest_particle);
 
     double creation_standoff = 10.0;
     double destruction_standoff = 50.0;
@@ -31,7 +31,7 @@ void create_snowflake(int N, FILE *log, int symmetry_degree, symmetry_type_enum 
     if (num_particles == 0) {
         num_particles = 1;
         N -= 1;
-        bsp_add_point(b, 0.0, 0.0);
+        add_point_to_flake(b, 0.0, 0.0);
         log_new_particle(log, 0.0, 0.0);
     }
     else {
@@ -66,7 +66,7 @@ void create_snowflake(int N, FILE *log, int symmetry_degree, symmetry_type_enum 
             num_iterations += 1;
 
             // Find the closest particle in the flake
-            bsp_result d = bsp_find_nearest(b, x, y);
+            bsp_result d = find_nearest_in_flake(b, x, y);
 
             // Check if we've collided
             if (d.d <= 2.0) {
@@ -127,7 +127,7 @@ void create_snowflake(int N, FILE *log, int symmetry_degree, symmetry_type_enum 
 
         // possibly increase the BSP size
         if (dis >= b->size) {
-            b = bsp_change_size(b, b->size * 2);
+            b = change_flake_size(b, b->size * 2);
         }
 
         if (symmetry_type == NONE) {
@@ -162,5 +162,5 @@ void create_snowflake(int N, FILE *log, int symmetry_degree, symmetry_type_enum 
         destruction_boundary = fmax(destruction_boundary, dis + destruction_standoff);
     }
 
-    bsp_destroy(b);
+    destroy_flake(b);
 }

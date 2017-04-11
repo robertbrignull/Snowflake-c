@@ -14,7 +14,7 @@ bsp_result bsp_find_nearest_impl(bsp_t *b, int node_index, double point_x, doubl
 
 
 // Creates an empty bsp tree of the given size
-bsp_t *bsp_new(double S) {
+bsp_t *new_flake(double S) {
     bsp_t *b = (bsp_t*) malloc(sizeof(bsp_t));
     CHECK_MEM(b);
 
@@ -44,7 +44,7 @@ bsp_t *bsp_new(double S) {
 }
 
 // Destroys the tree, freeing memory
-void bsp_destroy(bsp_t *b) {
+void destroy_flake(bsp_t *b) {
     free(b->nodes);
     free(b->buckets);
     free(b);
@@ -52,22 +52,22 @@ void bsp_destroy(bsp_t *b) {
 
 // A convenience method to create a new bsp of the given
 // size, copy across all points, and destroy the old bsp.
-bsp_t *bsp_change_size(bsp_t *b, double new_size) {
-    bsp_t *new_b = bsp_new(new_size);
+bsp_t *change_flake_size(bsp_t *b, double new_size) {
+    bsp_t *new_b = new_flake(new_size);
 
     for (int i = 0; i < b->num_buckets; i++) {
         for (int j = 0; j < b->buckets[i].size; j++) {
-            bsp_add_point(new_b, b->buckets[i].points[j].x, b->buckets[i].points[j].y);
+            add_point_to_flake(new_b, b->buckets[i].points[j].x, b->buckets[i].points[j].y);
         }
     }
 
-    bsp_destroy(b);
+    destroy_flake(b);
 
     return new_b;
 }
 
 // Adds a point to the tree
-void bsp_add_point(bsp_t *b, double x, double y) {
+void add_point_to_flake(bsp_t *b, double x, double y) {
     if (x <= -b->size || x >= b->size || y <= -b->size || y >= b->size) {
         printf("Cannot add (%f, %f), outside of bsp region.\n", x, y);
         return;
@@ -77,7 +77,7 @@ void bsp_add_point(bsp_t *b, double x, double y) {
 }
 
 // Returns the distance to the nearest point in the tree
-bsp_result bsp_find_nearest(bsp_t *b, double x, double y) {
+bsp_result find_nearest_in_flake(bsp_t *b, double x, double y) {
     return bsp_find_nearest_impl(b, 0, x, y);
 }
 
