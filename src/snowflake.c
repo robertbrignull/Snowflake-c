@@ -4,7 +4,7 @@
 #include <sys/resource.h>
 
 #include "args/arg_parsing.h"
-#include "data/bsp/bsp_test.h"
+#include "data/bsp_test.h"
 #include "render/render_log.h"
 #include "gen/snowflake_gen.h"
 

@@ -5,7 +5,7 @@
 
 #include "algo.h"
 
-#include "data/bsp/bsp.h"
+#include "bsp.h"
 
 // Declare private functions
 void bsp_add_point_impl(bsp_t *b, int node_index, double point_x, double point_y);
