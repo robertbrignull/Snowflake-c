@@ -60,18 +60,23 @@ typedef struct bsp_result {
 
 
 
-// Creates an empty bsp tree with the given size
-bsp_t *new_flake(double S);
+typedef bsp_t flake;
+typedef bsp_result flake_result;
 
-// Destroys the tree, freeing memory
-void destroy_flake(bsp_t *b);
 
-// A convenience method to create a new bsp of the given
-// size, copy across all points, and destroy the old bsp.
-bsp_t *change_flake_size(bsp_t *b, double new_size);
 
-// Adds a point to the tree
-void add_point_to_flake(bsp_t *b, double x, double y);
+// Creates an empty flake with the given size
+flake *new_flake(double S);
 
-// Returns the distance to the nearest point in the tree
-bsp_result find_nearest_in_flake(bsp_t *b, double x, double y);
+// Destroys the flake, freeing memory
+void destroy_flake(flake *f);
+
+// A convenience method to create a new flake of the given
+// size, copy across all points, and destroy the old flake
+flake *change_flake_size(flake *f, double new_size);
+
+// Adds a point to the flake
+void add_point_to_flake(flake *f, double x, double y);
+
+// Returns the distance to the nearest point in the flake
+flake_result find_nearest_in_flake(flake *fb, double x, double y);

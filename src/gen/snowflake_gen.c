@@ -10,7 +10,7 @@
 
 #include "gen/snowflake_gen.h"
 
-void add_point(bsp_t *b, FILE *log, double x, double y) {
+void add_point(flake *b, FILE *log, double x, double y) {
     // add the new point
     add_point_to_flake(b, x, y);
 
@@ -21,7 +21,7 @@ void add_point(bsp_t *b, FILE *log, double x, double y) {
 void create_snowflake(int N, FILE *log, int symmetry_degree, symmetry_type_enum symmetry_type, int silent) {
     int num_particles = 0;
     double farthest_particle = 0.0;
-    bsp_t *b = read_log_as_flake(log, &num_particles, &farthest_particle);
+    flake *b = read_log_as_flake(log, &num_particles, &farthest_particle);
 
     double creation_standoff = 10.0;
     double destruction_standoff = 50.0;
@@ -66,7 +66,7 @@ void create_snowflake(int N, FILE *log, int symmetry_degree, symmetry_type_enum 
             num_iterations += 1;
 
             // Find the closest particle in the flake
-            bsp_result d = find_nearest_in_flake(b, x, y);
+            flake_result d = find_nearest_in_flake(b, x, y);
 
             // Check if we've collided
             if (d.d <= 2.0) {
@@ -125,7 +125,7 @@ void create_snowflake(int N, FILE *log, int symmetry_degree, symmetry_type_enum 
 
         double dis = dist_origin(x, y);
 
-        // possibly increase the BSP size
+        // possibly increase the flake size
         if (dis >= b->size) {
             b = change_flake_size(b, b->size * 2);
         }
