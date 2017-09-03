@@ -1,6 +1,10 @@
 #pragma once
 
-#include "data/bsp/bsp.h"
+typedef struct bsp_t bsp_t;
+
+typedef struct flake {
+    bsp_t *bsp;
+} flake;
 
 typedef struct flake_result {
     // How far to the node
@@ -27,4 +31,4 @@ void destroy_flake(flake *f);
 void add_point_to_flake(flake *f, double x, double y);
 
 // Returns the distance to the nearest point in the flake
-flake_result find_nearest_in_flake(flake *fb, double x, double y);
+flake_result find_nearest_in_flake(flake *f, double x, double y);

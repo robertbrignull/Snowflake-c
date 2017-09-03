@@ -1,5 +1,7 @@
 #pragma once
 
+#include "data/flake.h"
+
 typedef enum bsp_type_e {BSP_CROSS, BSP_BUCKET} bsp_type_e;
 
 typedef enum bsp_dir_e {SW = 0, NW = 1, SE = 2, NE = 3} bsp_dir_e;
@@ -50,6 +52,14 @@ typedef struct bsp_t {
     int num_buckets;
 } bsp_t;
 
+// Creates an empty flake with the given size
+bsp_t *bsp_new_flake(double S);
 
+// Destroys the flake, freeing memory
+void bsp_destroy_flake(bsp_t *f);
 
-typedef bsp_t flake;
+// Adds a point to the flake
+void bsp_add_point_to_flake(bsp_t *f, double x, double y);
+
+// Returns the distance to the nearest point in the flake
+flake_result bsp_find_nearest_in_flake(bsp_t *f, double x, double y);

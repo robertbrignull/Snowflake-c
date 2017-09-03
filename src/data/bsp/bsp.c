@@ -15,7 +15,7 @@ flake_result bsp_find_nearest_impl(bsp_t *b, int node_index, double point_x, dou
 
 
 // Initialise an empty bsp
-void init_flake(bsp_t *b, double S) {
+void bsp_init_flake(bsp_t *b, double S) {
     b->size = S;
     b->nodes_size = 1000;
     b->nodes = (bsp_node*) malloc(sizeof(bsp_node) * b->nodes_size);
@@ -40,45 +40,45 @@ void init_flake(bsp_t *b, double S) {
 }
 
 // Creates an empty bsp tree of the given size
-bsp_t *new_flake(double S) {
+bsp_t *bsp_new_flake(double S) {
     bsp_t *b = (bsp_t*) malloc(sizeof(bsp_t));
     CHECK_MEM(b);
 
-    init_flake(b, S);
+    bsp_init_flake(b, S);
 
     return b;
 }
 
 // Destroys the tree, freeing memory
-void destroy_flake(bsp_t *b) {
+void bsp_destroy_flake(bsp_t *b) {
     free(b->nodes);
     free(b->buckets);
     free(b);
 }
 
 // Increase the size of a bsp
-void change_bsp_size(bsp_t *b, double new_size) {
+void bsp_change_size(bsp_t *b, double new_size) {
     // store the old values of b
     bsp_t *old_b = (bsp_t*) malloc(sizeof(bsp_t));
     CHECK_MEM(old_b);
     memcpy(old_b, b, sizeof(bsp_t));
 
-    init_flake(b, new_size);
+    bsp_init_flake(b, new_size);
 
     for (int i = 0; i < old_b->num_buckets; i++) {
         for (int j = 0; j < old_b->buckets[i].size; j++) {
-            add_point_to_flake(b, old_b->buckets[i].points[j].x, old_b->buckets[i].points[j].y);
+            bsp_add_point_to_flake(b, old_b->buckets[i].points[j].x, old_b->buckets[i].points[j].y);
         }
     }
 
-    destroy_flake(old_b);
+    bsp_destroy_flake(old_b);
 }
 
 // Adds a point to the tree
-void add_point_to_flake(bsp_t *b, double x, double y) {
+void bsp_add_point_to_flake(bsp_t *b, double x, double y) {
     // possibly increase the flake size
     if (dist_origin(x, y) >= b->size) {
-        change_bsp_size(b, b->size * 2);
+        bsp_change_size(b, b->size * 2);
     }
 
     if (x <= -b->size || x >= b->size || y <= -b->size || y >= b->size) {
@@ -90,7 +90,7 @@ void add_point_to_flake(bsp_t *b, double x, double y) {
 }
 
 // Returns the distance to the nearest point in the tree
-flake_result find_nearest_in_flake(bsp_t *b, double x, double y) {
+flake_result bsp_find_nearest_in_flake(bsp_t *b, double x, double y) {
     return bsp_find_nearest_impl(b, 0, x, y);
 }
 

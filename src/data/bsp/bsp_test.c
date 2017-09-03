@@ -11,7 +11,7 @@
 void test_create_bsp() {
     printf("Starting test_create_bsp...");
 
-    bsp_t *b = new_flake(100.0);
+    flake *b = new_flake(100.0);
 
     destroy_flake(b);
 
@@ -21,7 +21,7 @@ void test_create_bsp() {
 void test_add_single_point() {
     printf("Starting test_create_bsp...");
 
-    bsp_t *b = new_flake(100.0);
+    flake *b = new_flake(100.0);
 
     add_point_to_flake(b, 1.0, 2.0);
 
@@ -33,7 +33,7 @@ void test_add_single_point() {
 void test_add_multiple_point() {
     printf("Starting test_create_bsp...");
 
-    bsp_t *b = new_flake(100.0);
+    flake *b = new_flake(100.0);
 
     add_point_to_flake(b, 1.0, 2.0);
     add_point_to_flake(b, -1.0, 0.0);
@@ -46,7 +46,7 @@ void test_add_multiple_point() {
 void test_basic_distances() {
     printf("Starting test_basic_distances...");
 
-    bsp_t *b = new_flake(100.0);
+    flake *b = new_flake(100.0);
 
     assert(find_nearest_in_flake(b, 0.0, 0.0).d == -1.0);
 
@@ -66,7 +66,7 @@ void test_basic_distances() {
 void test_crossing_boundaries() {
     printf("Starting test_crossing_boundaries...");
 
-    bsp_t *b = new_flake(100.0);
+    flake *b = new_flake(100.0);
 
     assert(find_nearest_in_flake(b, 50.0, 50.0).d == -1.0);
 
@@ -84,7 +84,7 @@ void test_crossing_boundaries() {
 void test_point_added_twice() {
     printf("Starting test_point_added_twice...");
 
-    bsp_t *b = new_flake(100.0);
+    flake *b = new_flake(100.0);
 
     assert(find_nearest_in_flake(b, 50.0, 50.0).d == -1.0);
 
@@ -102,7 +102,7 @@ void test_point_added_twice() {
 void test_empty_region() {
     printf("Starting test_empty_region...");
 
-    bsp_t *b = new_flake(100.0);
+    flake *b = new_flake(100.0);
 
     assert(find_nearest_in_flake(b, 50.0, 50.0).d == -1.0);
 
@@ -134,7 +134,7 @@ void test_performance() {
 
     printf("N = %d, ", N);
 
-    bsp_t *b = new_flake(N);
+    flake *b = new_flake(N);
 
     gettimeofday(&s, 0);
     for (x = 0; x < N; x++) {
@@ -178,7 +178,7 @@ void test_random() {
 
     printf("N = %d, ", N);
 
-    bsp_t *b = new_flake(w);
+    flake *b = new_flake(w);
 
     gettimeofday(&s, 0);
     for (n = 0; n < N; n++) {
