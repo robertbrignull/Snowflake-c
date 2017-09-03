@@ -1,9 +1,14 @@
 #pragma once
 
 typedef struct bsp_t bsp_t;
+typedef struct linear_t linear_t;
 
 typedef struct flake {
-    bsp_t *bsp;
+    // Actual field used will depend on DATA_IMPL_* variables
+    union {
+        bsp_t *bsp;
+        linear_t *linear;
+    };
 } flake;
 
 typedef struct flake_result {
