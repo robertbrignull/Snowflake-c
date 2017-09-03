@@ -5,7 +5,7 @@
 #include <zconf.h>
 
 #include "algo.h"
-#include "data/bsp.h"
+#include "data/flake.h"
 #include "log/flake_log.h"
 
 #include "gen/snowflake_gen.h"

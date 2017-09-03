@@ -5,6 +5,7 @@
 
 #include "algo.h"
 
+#include "flake.h"
 #include "bsp.h"
 
 // Declare private functions

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stdio.h>
-#include "data/bsp.h"
+#include "data/flake.h"
 
 bsp_t *read_log_as_flake(FILE *flake, int *num_particles, double *farthest_particle);
 

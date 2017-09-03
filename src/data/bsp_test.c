@@ -4,6 +4,7 @@
 #include <assert.h>
 
 #include "bsp.h"
+#include "flake.h"
 
 #include "bsp_test.h"
 
