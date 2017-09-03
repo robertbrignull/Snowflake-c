@@ -1,3 +1,5 @@
+#pragma once
+
 #include "data/bsp/bsp.h"
 
 // Creates an empty flake with the given size
