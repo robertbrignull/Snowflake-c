@@ -17,7 +17,7 @@ void print_usage(int exit_code) {
     printf("    -o --output           Output filename for snowflake data\n");
     printf("                          If already exists then will continue the flake already there\n\n");
     printf("  Optional argumens:\n");
-    printf("    -n --num_particles    The number of particles to simulate\n");
+    printf("    -n --num-particles    The number of particles to simulate\n");
     printf("                          Default is no limit\n");
     printf("    -d --symmetry-degree  The number of axis of symmetry to employ\n");
     printf("                          Default is 6\n");
