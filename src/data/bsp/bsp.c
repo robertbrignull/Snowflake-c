@@ -4,9 +4,9 @@
 #include <string.h>
 
 #include "algo.h"
+#include "data/flake.h"
 
-#include "flake.h"
-#include "bsp.h"
+#include "data/bsp/bsp.h"
 
 // Declare private functions
 void bsp_add_point_impl(bsp_t *b, int node_index, double point_x, double point_y);

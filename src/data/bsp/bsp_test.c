@@ -3,8 +3,8 @@
 #include <sys/time.h>
 #include <assert.h>
 
-#include "bsp.h"
-#include "flake.h"
+#include "data/bsp/bsp.h"
+#include "data/flake.h"
 
 #include "bsp_test.h"
 

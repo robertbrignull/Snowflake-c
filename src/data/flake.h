@@ -1,4 +1,4 @@
-#include "bsp.h"
+#include "data/bsp/bsp.h"
 
 // Creates an empty flake with the given size
 flake *new_flake(double S);
