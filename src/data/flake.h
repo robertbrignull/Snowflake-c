@@ -10,6 +10,13 @@ typedef struct flake_result {
     double x, y;
 } flake_result;
 
+// Given two flake_results determine which has the smaller d value
+inline flake_result min_flake_result(flake_result r1, flake_result r2) {
+    return (r1.d == -1.0 || (r2.d != -1.0 && r2.d < r1.d)) ? r2 : r1;
+}
+
+
+
 // Creates an empty flake with the given size
 flake *new_flake(double S);
 

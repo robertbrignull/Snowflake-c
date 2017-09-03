@@ -200,10 +200,6 @@ void bsp_add_point_impl(bsp_t *b, int node_index, double point_x, double point_y
     bsp_add_to_bucket_node(b, node_index, child, point_x, point_y);
 }
 
-flake_result min_bsp_result(flake_result r1, flake_result r2) {
-    return (r1.d == -1.0 || (r2.d != -1.0 && r2.d < r1.d)) ? r2 : r1;
-}
-
 flake_result bsp_find_nearest_for_child(bsp_t *b, int node_index, bsp_dir_e child, double point_x, double point_y) {
     bsp_node node = b->nodes[node_index];
 
@@ -230,7 +226,7 @@ flake_result bsp_find_nearest_for_child(bsp_t *b, int node_index, bsp_dir_e chil
             r2.x = bucket->points[i].x;
             r2.y = bucket->points[i].y;
             r2.d = dist(point_x, point_y, bucket->points[i].x, bucket->points[i].y);
-            r = min_bsp_result(r, r2);
+            r = min_flake_result(r, r2);
         }
 
         return r;
@@ -271,34 +267,34 @@ flake_result bsp_find_nearest_impl(bsp_t *b, int node_index, double point_x, dou
     }
 
     if (adx < ady) {
-        r = min_bsp_result(r, bsp_find_nearest_for_child(b, node_index, H, point_x, point_y));
+        r = min_flake_result(r, bsp_find_nearest_for_child(b, node_index, H, point_x, point_y));
 
         if (r.d != -1.0 && r.d <= ady) {
             return r;
         }
 
-        r = min_bsp_result(r, bsp_find_nearest_for_child(b, node_index, V, point_x, point_y));
+        r = min_flake_result(r, bsp_find_nearest_for_child(b, node_index, V, point_x, point_y));
 
         if (r.d != -1.0 && r.d <= dist_origin(dx, dy)) {
             return r;
         }
 
-        return min_bsp_result(r, bsp_find_nearest_for_child(b, node_index, F, point_x, point_y));
+        return min_flake_result(r, bsp_find_nearest_for_child(b, node_index, F, point_x, point_y));
     }
     else {
-        r = min_bsp_result(r, bsp_find_nearest_for_child(b, node_index, V, point_x, point_y));
+        r = min_flake_result(r, bsp_find_nearest_for_child(b, node_index, V, point_x, point_y));
 
         if (r.d != -1.0 && r.d <= adx) {
             return r;
         }
 
-        r = min_bsp_result(r, bsp_find_nearest_for_child(b, node_index, H, point_x, point_y));
+        r = min_flake_result(r, bsp_find_nearest_for_child(b, node_index, H, point_x, point_y));
 
         if (r.d != -1.0 && r.d <= dist_origin(dx, dy)) {
             return r;
         }
 
-        return min_bsp_result(r, bsp_find_nearest_for_child(b, node_index, F, point_x, point_y));
+        return min_flake_result(r, bsp_find_nearest_for_child(b, node_index, F, point_x, point_y));
     }
 }
 
