@@ -43,7 +43,7 @@ void print_usage(int exit_code) {
     printf("    -f --frames           The number of frames to produce if making a movie\n");
     printf("    -s --silent           Don't output progress\n\n");
 
-    printf("Mode bsp_test\n");
+    printf("Mode bsp-test\n");
     printf("  runs tests on the BSP implementation.\n\n");
     printf("  no arguments\n\n");
 
@@ -243,7 +243,7 @@ arg_options *parse_args(int argc, char **argv) {
             print_missing_argument("--frames");
         }
     }
-    else if (arg_matches(argv[1], "bsp_test", 0)) { // BSP_TEST
+    else if (arg_matches(argv[1], "bsp-test", 0)) { // BSP_TEST
         args->mode = BSP_TEST;
     }
     else {
