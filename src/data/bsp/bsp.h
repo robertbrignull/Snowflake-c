@@ -50,15 +50,6 @@ typedef struct bsp_t {
     int num_buckets;
 } bsp_t;
 
-typedef struct bsp_result {
-    // How far to the node
-    double d;
-
-    // Where actually was the node
-    double x, y;
-} bsp_result;
-
 
 
 typedef bsp_t flake;
-typedef bsp_result flake_result;

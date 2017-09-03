@@ -2,6 +2,14 @@
 
 #include "data/bsp/bsp.h"
 
+typedef struct flake_result {
+    // How far to the node
+    double d;
+
+    // Where actually was the node
+    double x, y;
+} flake_result;
+
 // Creates an empty flake with the given size
 flake *new_flake(double S);
 

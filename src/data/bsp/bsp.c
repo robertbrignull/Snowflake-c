@@ -10,7 +10,7 @@
 
 // Declare private functions
 void bsp_add_point_impl(bsp_t *b, int node_index, double point_x, double point_y);
-bsp_result bsp_find_nearest_impl(bsp_t *b, int node_index, double point_x, double point_y);
+flake_result bsp_find_nearest_impl(bsp_t *b, int node_index, double point_x, double point_y);
 
 
 
@@ -78,7 +78,7 @@ void add_point_to_flake(bsp_t *b, double x, double y) {
 }
 
 // Returns the distance to the nearest point in the tree
-bsp_result find_nearest_in_flake(bsp_t *b, double x, double y) {
+flake_result find_nearest_in_flake(bsp_t *b, double x, double y) {
     return bsp_find_nearest_impl(b, 0, x, y);
 }
 
@@ -200,11 +200,11 @@ void bsp_add_point_impl(bsp_t *b, int node_index, double point_x, double point_y
     bsp_add_to_bucket_node(b, node_index, child, point_x, point_y);
 }
 
-bsp_result min_bsp_result(bsp_result r1, bsp_result r2) {
+flake_result min_bsp_result(flake_result r1, flake_result r2) {
     return (r1.d == -1.0 || (r2.d != -1.0 && r2.d < r1.d)) ? r2 : r1;
 }
 
-bsp_result bsp_find_nearest_for_child(bsp_t *b, int node_index, bsp_dir_e child, double point_x, double point_y) {
+flake_result bsp_find_nearest_for_child(bsp_t *b, int node_index, bsp_dir_e child, double point_x, double point_y) {
     bsp_node node = b->nodes[node_index];
 
     if (node.child_types[child] == BSP_CROSS) {
@@ -213,7 +213,7 @@ bsp_result bsp_find_nearest_for_child(bsp_t *b, int node_index, bsp_dir_e child,
     else {
         bsp_bucket *bucket = &(b->buckets[node.children[child]]);
 
-        bsp_result r;
+        flake_result r;
 
         if (bucket->size == 0) {
             r.x = r.y = 0.0;
@@ -226,7 +226,7 @@ bsp_result bsp_find_nearest_for_child(bsp_t *b, int node_index, bsp_dir_e child,
         r.d = dist(point_x, point_y, bucket->points[0].x, bucket->points[0].y);
 
         for (int i = 1; i < bucket->size; i++) {
-            bsp_result r2;
+            flake_result r2;
             r2.x = bucket->points[i].x;
             r2.y = bucket->points[i].y;
             r2.d = dist(point_x, point_y, bucket->points[i].x, bucket->points[i].y);
@@ -237,7 +237,7 @@ bsp_result bsp_find_nearest_for_child(bsp_t *b, int node_index, bsp_dir_e child,
     }
 }
 
-bsp_result bsp_find_nearest_impl(bsp_t *b, int node_index, double point_x, double point_y) {
+flake_result bsp_find_nearest_impl(bsp_t *b, int node_index, double point_x, double point_y) {
     bsp_node node = b->nodes[node_index];
 
     double dx = point_x - node.node_x - node.node_size / 2;
@@ -264,7 +264,7 @@ bsp_result bsp_find_nearest_impl(bsp_t *b, int node_index, double point_x, doubl
         N = NE; H = NW; V = SE; F = SW;
     }
 
-    bsp_result r = bsp_find_nearest_for_child(b, node_index, N, point_x, point_y);
+    flake_result r = bsp_find_nearest_for_child(b, node_index, N, point_x, point_y);
 
     if (r.d != -1.0 && r.d <= adx && r.d <= ady) {
         return r;

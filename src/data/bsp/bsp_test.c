@@ -51,7 +51,7 @@ void test_basic_distances() {
     assert(find_nearest_in_flake(b, 0.0, 0.0).d == -1.0);
 
     add_point_to_flake(b, 1.0, 2.0);
-    bsp_result d = find_nearest_in_flake(b, 0.0, 0.0);
+    flake_result d = find_nearest_in_flake(b, 0.0, 0.0);
     assert(d.d > 2.236 && d.d < 2.237);
 
     add_point_to_flake(b, -1.0, 0.0);
@@ -73,7 +73,7 @@ void test_crossing_boundaries() {
     add_point_to_flake(b, 45.0, 26.0);
     add_point_to_flake(b, 49.0, 24.0);
 
-    bsp_result d = find_nearest_in_flake(b, 45.0, 24.0);
+    flake_result d = find_nearest_in_flake(b, 45.0, 24.0);
     assert(d.d > 1.999 && d.d < 2.001);
 
     destroy_flake(b);
@@ -91,7 +91,7 @@ void test_point_added_twice() {
     add_point_to_flake(b, 40.0, 40.0);
     add_point_to_flake(b, 40.0, 40.0);
 
-    bsp_result d = find_nearest_in_flake(b, 38.0, 40.0);
+    flake_result d = find_nearest_in_flake(b, 38.0, 40.0);
     assert(d.d > 1.999 && d.d < 2.001);
 
     destroy_flake(b);
@@ -109,7 +109,7 @@ void test_empty_region() {
     add_point_to_flake(b, 25.0, 25.0);
     add_point_to_flake(b, 25.0, 60.0);
 
-    bsp_result d = find_nearest_in_flake(b, 75.0, 25.0);
+    flake_result d = find_nearest_in_flake(b, 75.0, 25.0);
     assert(d.d > 49.999 && d.d < 50.001);
 
     d = find_nearest_in_flake(b, 55.0, 60.0);
@@ -130,7 +130,7 @@ void test_performance() {
     int x, y;
     struct timeval s, e;
     __time_t t;
-    bsp_result d;
+    flake_result d;
 
     printf("N = %d, ", N);
 
