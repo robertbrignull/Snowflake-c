@@ -14,11 +14,8 @@ flake_result bsp_find_nearest_impl(bsp_t *b, int node_index, double point_x, dou
 
 
 
-// Creates an empty bsp tree of the given size
-bsp_t *new_flake(double S) {
-    bsp_t *b = (bsp_t*) malloc(sizeof(bsp_t));
-    CHECK_MEM(b);
-
+// Initialise an empty bsp
+void init_flake(bsp_t *b, double S) {
     b->size = S;
     b->nodes_size = 1000;
     b->nodes = (bsp_node*) malloc(sizeof(bsp_node) * b->nodes_size);
@@ -40,6 +37,14 @@ bsp_t *new_flake(double S) {
 
     b->num_nodes = 1;
     b->num_buckets = 4;
+}
+
+// Creates an empty bsp tree of the given size
+bsp_t *new_flake(double S) {
+    bsp_t *b = (bsp_t*) malloc(sizeof(bsp_t));
+    CHECK_MEM(b);
+
+    init_flake(b, S);
 
     return b;
 }
@@ -51,24 +56,31 @@ void destroy_flake(bsp_t *b) {
     free(b);
 }
 
-// A convenience method to create a new bsp of the given
-// size, copy across all points, and destroy the old bsp.
-bsp_t *change_flake_size(bsp_t *b, double new_size) {
-    bsp_t *new_b = new_flake(new_size);
+// Increase the size of a bsp
+void change_bsp_size(bsp_t *b, double new_size) {
+    // store the old values of b
+    bsp_t *old_b = (bsp_t*) malloc(sizeof(bsp_t));
+    CHECK_MEM(old_b);
+    memcpy(old_b, b, sizeof(bsp_t));
 
-    for (int i = 0; i < b->num_buckets; i++) {
-        for (int j = 0; j < b->buckets[i].size; j++) {
-            add_point_to_flake(new_b, b->buckets[i].points[j].x, b->buckets[i].points[j].y);
+    init_flake(b, new_size);
+
+    for (int i = 0; i < old_b->num_buckets; i++) {
+        for (int j = 0; j < old_b->buckets[i].size; j++) {
+            add_point_to_flake(b, old_b->buckets[i].points[j].x, old_b->buckets[i].points[j].y);
         }
     }
 
-    destroy_flake(b);
-
-    return new_b;
+    destroy_flake(old_b);
 }
 
 // Adds a point to the tree
 void add_point_to_flake(bsp_t *b, double x, double y) {
+    // possibly increase the flake size
+    if (dist_origin(x, y) >= b->size) {
+        change_bsp_size(b, b->size * 2);
+    }
+
     if (x <= -b->size || x >= b->size || y <= -b->size || y >= b->size) {
         printf("Cannot add (%f, %f), outside of bsp region.\n", x, y);
         return;

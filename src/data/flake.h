@@ -23,10 +23,6 @@ flake *new_flake(double S);
 // Destroys the flake, freeing memory
 void destroy_flake(flake *f);
 
-// A convenience method to create a new flake of the given
-// size, copy across all points, and destroy the old flake
-flake *change_flake_size(flake *f, double new_size);
-
 // Adds a point to the flake
 void add_point_to_flake(flake *f, double x, double y);
 

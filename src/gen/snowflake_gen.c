@@ -125,11 +125,6 @@ void create_snowflake(int N, FILE *log, int symmetry_degree, symmetry_type_enum 
 
         double dis = dist_origin(x, y);
 
-        // possibly increase the flake size
-        if (dis >= b->size) {
-            b = change_flake_size(b, b->size * 2);
-        }
-
         if (symmetry_type == NONE) {
             add_point(b, log, x, y);
 

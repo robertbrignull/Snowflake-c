@@ -36,9 +36,6 @@ bsp_t *read_log_as_flake(FILE *flake, int *num_particles, double *farthest_parti
 
     flake_log_line line;
     while (read_line_from_log(flake, &line)) {
-        if (fabs(line.x) >= b->size || fabs(line.y) >= b->size) {
-            b = change_flake_size(b, b->size * 2);
-        }
         add_point_to_flake(b, line.x, line.y);
         *num_particles += 1;
         *farthest_particle = fmax(*farthest_particle, dist_origin(line.x, line.y));
