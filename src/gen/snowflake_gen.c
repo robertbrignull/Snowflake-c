@@ -18,10 +18,10 @@ void add_point(flake *b, FILE *log, double x, double y) {
     log_new_particle(log, x, y);
 }
 
-void create_snowflake(int N, FILE *log, int symmetry_degree, symmetry_type_enum symmetry_type, int silent) {
+void create_snowflake(int N, FILE *log, flake_impl impl, int symmetry_degree, symmetry_type_enum symmetry_type, int silent) {
     int num_particles = 0;
     double farthest_particle = 0.0;
-    flake *b = read_log_as_flake(log, &num_particles, &farthest_particle);
+    flake *b = read_log_as_flake(log, impl, &num_particles, &farthest_particle);
 
     double creation_standoff = 10.0;
     double destruction_standoff = 50.0;

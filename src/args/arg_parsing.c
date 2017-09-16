@@ -17,6 +17,9 @@ void print_usage(int exit_code) {
     printf("    -o --output           Output filename for snowflake data\n");
     printf("                          If already exists then will continue the flake already there\n\n");
     printf("  Optional argumens:\n");
+    printf("    --impl                Internal data structure implementation to use. Options include:\n");
+    printf("                          - BSP: Quadtree implementation (default)\n");
+    printf("                          - LINEAR: Simple array with linear lookup\n");
     printf("    -n --num-particles    The number of particles to simulate\n");
     printf("                          Default is no limit\n");
     printf("    -d --symmetry-degree  The number of axis of symmetry to employ\n");
@@ -117,6 +120,7 @@ arg_options *parse_args(int argc, char **argv) {
         int output_set = 0;
 
         // optional args
+        args->gen.impl = BSP;
         args->gen.num_particles = -1;
         args->gen.symmetry_degree = 6;
         args->gen.symmetry_type = NONE;
@@ -136,6 +140,19 @@ arg_options *parse_args(int argc, char **argv) {
                 CHECK_MEM(args->gen.output);
                 strcpy(args->gen.output, argv[argi+1]);
                 output_set = 1;
+                argi += 2;
+            }
+            else if (arg_matches(argv[argi], "--impl", 0)) {
+                check_enough_parameters(argv[argi], argc, argi, 1);
+                if (arg_matches(argv[argi+1], "BSP", 0)) {
+                    args->gen.impl = BSP;
+                }
+                else if (arg_matches(argv[argi+1], "LINEAR", 0)) {
+                    args->gen.impl = LINEAR;
+                }
+                else {
+                    print_unrecognised_argument(argv[argi+1]);
+                }
                 argi += 2;
             }
             else if (arg_matches(argv[argi], "--symmetry-degree", "-d")) {

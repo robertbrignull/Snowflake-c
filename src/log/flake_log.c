@@ -26,10 +26,10 @@ int read_line_from_log(FILE *flake, flake_log_line *line) {
     return fread(line, sizeof(flake_log_line), 1, flake) == 1;
 }
 
-flake *read_log_as_flake(FILE *log, int *num_particles, double *farthest_particle) {
+flake *read_log_as_flake(FILE *log, flake_impl impl, int *num_particles, double *farthest_particle) {
     fseek(log, 0, SEEK_SET);
 
-    flake *f = new_flake(50);
+    flake *f = new_flake(50, impl);
 
     *num_particles = 0;
     *farthest_particle = 0.0;

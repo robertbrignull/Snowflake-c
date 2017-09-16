@@ -1,10 +1,12 @@
 #pragma once
 
+#include "args/arg_parsing.h"
+
 typedef struct bsp_t bsp_t;
 typedef struct linear_t linear_t;
 
 typedef struct flake {
-    // Actual field used will depend on DATA_IMPL_* variables
+    flake_impl impl;
     union {
         bsp_t *bsp;
         linear_t *linear;
@@ -27,7 +29,7 @@ inline flake_result min_flake_result(flake_result r1, flake_result r2) {
 
 
 // Creates an empty flake with the given size
-flake *new_flake(double S);
+flake *new_flake(double S, flake_impl impl);
 
 // Destroys the flake, freeing memory
 void destroy_flake(flake *f);

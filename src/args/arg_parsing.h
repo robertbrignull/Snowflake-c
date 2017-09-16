@@ -4,9 +4,12 @@ typedef enum program_mode {SNOWFLAKE_GEN, RENDER, BSP_TEST} program_mode;
 
 typedef enum symmetry_type_enum {NONE, ROTATIONAL, FULL} symmetry_type_enum;
 
+typedef enum flake_impl { BSP, LINEAR } flake_impl;
+
 typedef struct arg_options_gen {
     int num_particles;
     char *output;
+    flake_impl impl;
     int symmetry_degree;
     symmetry_type_enum symmetry_type;
     int silent;

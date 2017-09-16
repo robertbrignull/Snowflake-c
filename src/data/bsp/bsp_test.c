@@ -4,14 +4,13 @@
 #include <assert.h>
 
 #include "data/bsp/bsp.h"
-#include "data/flake.h"
 
 #include "bsp_test.h"
 
 void test_create_bsp() {
     printf("Starting test_create_bsp...");
 
-    flake *b = new_flake(100.0);
+    flake *b = new_flake(100.0, BSP);
 
     destroy_flake(b);
 
@@ -21,7 +20,7 @@ void test_create_bsp() {
 void test_add_single_point() {
     printf("Starting test_create_bsp...");
 
-    flake *b = new_flake(100.0);
+    flake *b = new_flake(100.0, BSP);
 
     add_point_to_flake(b, 1.0, 2.0);
 
@@ -33,7 +32,7 @@ void test_add_single_point() {
 void test_add_multiple_point() {
     printf("Starting test_create_bsp...");
 
-    flake *b = new_flake(100.0);
+    flake *b = new_flake(100.0, BSP);
 
     add_point_to_flake(b, 1.0, 2.0);
     add_point_to_flake(b, -1.0, 0.0);
@@ -46,7 +45,7 @@ void test_add_multiple_point() {
 void test_basic_distances() {
     printf("Starting test_basic_distances...");
 
-    flake *b = new_flake(100.0);
+    flake *b = new_flake(100.0, BSP);
 
     assert(find_nearest_in_flake(b, 0.0, 0.0).d == -1.0);
 
@@ -66,7 +65,7 @@ void test_basic_distances() {
 void test_crossing_boundaries() {
     printf("Starting test_crossing_boundaries...");
 
-    flake *b = new_flake(100.0);
+    flake *b = new_flake(100.0, BSP);
 
     assert(find_nearest_in_flake(b, 50.0, 50.0).d == -1.0);
 
@@ -84,7 +83,7 @@ void test_crossing_boundaries() {
 void test_point_added_twice() {
     printf("Starting test_point_added_twice...");
 
-    flake *b = new_flake(100.0);
+    flake *b = new_flake(100.0, BSP);
 
     assert(find_nearest_in_flake(b, 50.0, 50.0).d == -1.0);
 
@@ -102,7 +101,7 @@ void test_point_added_twice() {
 void test_empty_region() {
     printf("Starting test_empty_region...");
 
-    flake *b = new_flake(100.0);
+    flake *b = new_flake(100.0, BSP);
 
     assert(find_nearest_in_flake(b, 50.0, 50.0).d == -1.0);
 
@@ -134,7 +133,7 @@ void test_performance() {
 
     printf("N = %d, ", N);
 
-    flake *b = new_flake(N);
+    flake *b = new_flake(N, BSP);
 
     gettimeofday(&s, 0);
     for (x = 0; x < N; x++) {
@@ -178,7 +177,7 @@ void test_random() {
 
     printf("N = %d, ", N);
 
-    flake *b = new_flake(w);
+    flake *b = new_flake(w, BSP);
 
     gettimeofday(&s, 0);
     for (n = 0; n < N; n++) {
