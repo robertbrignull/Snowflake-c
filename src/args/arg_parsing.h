@@ -1,6 +1,6 @@
 #pragma once
 
-typedef enum program_mode {SNOWFLAKE_GEN, RENDER, BSP_TEST} program_mode;
+typedef enum program_mode {SNOWFLAKE_GEN, RENDER, TESTS} program_mode;
 
 typedef enum symmetry_type_enum {NONE, ROTATIONAL, FULL} symmetry_type_enum;
 
@@ -24,11 +24,16 @@ typedef struct arg_options_render {
     int silent;
 } arg_options_render;
 
+typedef struct arg_options_tests {
+    flake_impl impl;
+} arg_options_tests;
+
 typedef struct arg_options {
     program_mode mode;
     union {
         arg_options_gen gen;
         arg_options_render render;
+        arg_options_tests tests;
     };
 } arg_options;
 

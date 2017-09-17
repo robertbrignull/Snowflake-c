@@ -3,24 +3,24 @@
 #include <sys/time.h>
 #include <assert.h>
 
-#include "data/bsp/bsp.h"
+#include "data/flake.h"
 
-#include "bsp_test.h"
+#include "tests.h"
 
-void test_create_bsp() {
-    printf("Starting test_create_bsp...");
+void test_create_flake(flake_impl impl) {
+    printf("Starting test_create_flake...");
 
-    flake *b = new_flake(100.0, BSP);
+    flake *b = new_flake(100.0, impl);
 
     destroy_flake(b);
 
     printf(" Done\n");
 }
 
-void test_add_single_point() {
-    printf("Starting test_create_bsp...");
+void test_add_single_point(flake_impl impl) {
+    printf("Starting test_create_flake...");
 
-    flake *b = new_flake(100.0, BSP);
+    flake *b = new_flake(100.0, impl);
 
     add_point_to_flake(b, 1.0, 2.0);
 
@@ -29,10 +29,10 @@ void test_add_single_point() {
     printf(" Done\n");
 }
 
-void test_add_multiple_point() {
-    printf("Starting test_create_bsp...");
+void test_add_multiple_point(flake_impl impl) {
+    printf("Starting test_create_flake...");
 
-    flake *b = new_flake(100.0, BSP);
+    flake *b = new_flake(100.0, impl);
 
     add_point_to_flake(b, 1.0, 2.0);
     add_point_to_flake(b, -1.0, 0.0);
@@ -42,10 +42,10 @@ void test_add_multiple_point() {
     printf(" Done\n");
 }
 
-void test_basic_distances() {
+void test_basic_distances(flake_impl impl) {
     printf("Starting test_basic_distances...");
 
-    flake *b = new_flake(100.0, BSP);
+    flake *b = new_flake(100.0, impl);
 
     assert(find_nearest_in_flake(b, 0.0, 0.0).d == -1.0);
 
@@ -62,10 +62,10 @@ void test_basic_distances() {
     printf(" Done\n");
 }
 
-void test_crossing_boundaries() {
+void test_crossing_boundaries(flake_impl impl) {
     printf("Starting test_crossing_boundaries...");
 
-    flake *b = new_flake(100.0, BSP);
+    flake *b = new_flake(100.0, impl);
 
     assert(find_nearest_in_flake(b, 50.0, 50.0).d == -1.0);
 
@@ -80,10 +80,10 @@ void test_crossing_boundaries() {
     printf(" Done\n");
 }
 
-void test_point_added_twice() {
+void test_point_added_twice(flake_impl impl) {
     printf("Starting test_point_added_twice...");
 
-    flake *b = new_flake(100.0, BSP);
+    flake *b = new_flake(100.0, impl);
 
     assert(find_nearest_in_flake(b, 50.0, 50.0).d == -1.0);
 
@@ -98,10 +98,10 @@ void test_point_added_twice() {
     printf(" Done\n");
 }
 
-void test_empty_region() {
+void test_empty_region(flake_impl impl) {
     printf("Starting test_empty_region...");
 
-    flake *b = new_flake(100.0, BSP);
+    flake *b = new_flake(100.0, impl);
 
     assert(find_nearest_in_flake(b, 50.0, 50.0).d == -1.0);
 
@@ -122,7 +122,7 @@ void test_empty_region() {
     printf(" Done\n");
 }
 
-void test_performance() {
+void test_performance(flake_impl impl) {
     printf("Starting test_performance... ");
 
     int N = 1000;
@@ -133,7 +133,7 @@ void test_performance() {
 
     printf("N = %d, ", N);
 
-    flake *b = new_flake(N, BSP);
+    flake *b = new_flake(N, impl);
 
     gettimeofday(&s, 0);
     for (x = 0; x < N; x++) {
@@ -161,7 +161,7 @@ void test_performance() {
     printf("... Done\n");
 }
 
-void test_random() {
+void test_random(flake_impl impl) {
     printf("Starting test_random... ");
 
     int N = 1000000;
@@ -177,7 +177,7 @@ void test_random() {
 
     printf("N = %d, ", N);
 
-    flake *b = new_flake(w, BSP);
+    flake *b = new_flake(w, impl);
 
     gettimeofday(&s, 0);
     for (n = 0; n < N; n++) {
@@ -204,15 +204,15 @@ void test_random() {
     printf("... Done\n");
 }
 
-void run_bsp_tests() {
-    test_create_bsp();
-    test_add_single_point();
-    test_add_multiple_point();
-    test_basic_distances();
-    test_crossing_boundaries();
-    test_point_added_twice();
-    test_empty_region();
+void run_tests(flake_impl impl) {
+    test_create_flake(impl);
+    test_add_single_point(impl);
+    test_add_multiple_point(impl);
+    test_basic_distances(impl);
+    test_crossing_boundaries(impl);
+    test_point_added_twice(impl);
+    test_empty_region(impl);
 
-    test_performance();
-    test_random();
+    test_performance(impl);
+    test_random(impl);
 }

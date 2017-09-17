@@ -9,7 +9,7 @@
 void print_usage(int exit_code) {
     printf("Usage: snowflake mode [args...]\n");
     printf("       snowflake --help\n");
-    printf("  where mode is one gen, render, or bsp_test\n\n");
+    printf("  where mode is one gen, render, or tests\n\n");
 
     printf("Mode gen\n");
     printf("  generates a snowflake.\n\n");
@@ -46,9 +46,12 @@ void print_usage(int exit_code) {
     printf("    -f --frames           The number of frames to produce if making a movie\n");
     printf("    -s --silent           Don't output progress\n\n");
 
-    printf("Mode bsp-test\n");
-    printf("  runs tests on the BSP implementation.\n\n");
-    printf("  no arguments\n\n");
+    printf("Mode tests\n");
+    printf("  runs tests on the flake data structure implementation.\n\n");
+    printf("  Optional argumens:\n");
+    printf("    --impl                Internal data structure implementation to use. Options include:\n");
+    printf("                          - BSP: Quadtree implementation (default)\n");
+    printf("                          - LINEAR: Simple array with linear lookup\n\n");
 
     exit(exit_code);
 }
@@ -260,8 +263,31 @@ arg_options *parse_args(int argc, char **argv) {
             print_missing_argument("--frames");
         }
     }
-    else if (arg_matches(argv[1], "bsp-test", 0)) { // BSP_TEST
-        args->mode = BSP_TEST;
+    else if (arg_matches(argv[1], "tests", 0)) { // TESTS
+        args->mode = TESTS;
+
+        // optional args
+        args->tests.impl = BSP;
+
+        int argi = 2;
+        while (argi < argc) {
+            if (arg_matches(argv[argi], "--impl", 0)) {
+                check_enough_parameters(argv[argi], argc, argi, 1);
+                if (arg_matches(argv[argi+1], "BSP", 0)) {
+                    args->tests.impl = BSP;
+                }
+                else if (arg_matches(argv[argi+1], "LINEAR", 0)) {
+                    args->tests.impl = LINEAR;
+                }
+                else {
+                    print_unrecognised_argument(argv[argi+1]);
+                }
+                argi += 2;
+            }
+            else {
+                print_unrecognised_argument(argv[argi]);
+            }
+        }
     }
     else {
         print_unrecognised_argument(argv[1]);

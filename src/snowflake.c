@@ -4,7 +4,7 @@
 #include <sys/resource.h>
 
 #include "args/arg_parsing.h"
-#include "data/bsp/bsp_test.h"
+#include "tests/tests.h"
 #include "render/render_log.h"
 #include "gen/snowflake_gen.h"
 
@@ -34,8 +34,8 @@ int main(int argc, char **argv) {
         render_log(log, args->render.output,
             args->render.colorize, args->render.movie, args->render.num_frames, args->render.silent);
     }
-    else if (args->mode == BSP_TEST) {
-        run_bsp_tests();
+    else if (args->mode == TESTS) {
+        run_tests(args->tests.impl);
     }
 
     free_args(args);
