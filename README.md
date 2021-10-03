@@ -9,7 +9,18 @@ We use a bsp to store the snowflake as that was deemed to be the fastest datastr
 
 The output format is always png because it is lossless and offers excellent compression.
 
-### Use
+## Example output
+
+### 1 million point flake with no symmetry
+![none-1000000](https://user-images.githubusercontent.com/3749000/135746809-e0fd9308-9dd6-4f6c-ba83-4e909857a7c5.png)
+
+### 1 million point flake with 6 way symmetry
+![full-6-1000000](https://user-images.githubusercontent.com/3749000/135746792-6d4a7b1e-f785-4877-9cd7-061f1c798802.png)
+
+### 1 million point flake with 5 way rotational symmetry
+![rot-5-1000000](https://user-images.githubusercontent.com/3749000/135746815-49fa89d4-60d2-429f-bfa7-b62798a85c8c.png)
+
+## Use
 
 Compile by running from the root of the project `cmake .; make`.
 
