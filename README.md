@@ -1,3 +1,5 @@
+Also see https://github.com/robertbrignull/Snowflake for a another implementation of this same problem.
+
 # Snowflake
 This generates snowflakes by simulating random walks of individual particles until they collide with the snowflake.
 
